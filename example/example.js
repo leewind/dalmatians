@@ -24,7 +24,7 @@ Dalmatian.View = (function() {
       var templateFn = _.template(templateSource);
 
       try{
-        this.html = '<div class="view" id="'+this.viewid+'">'+templateFn(data)+'</div>';
+        this.html = '<section class="view" id="'+this.viewid+'">'+templateFn(data)+'</section>';
       }catch(e){
         throw Error('template parse error');
       }
@@ -80,26 +80,40 @@ Dalmatian.ViewController = (function(){
   var methods = {};
 
   methods.initialize = function() {
-    this.show();
+    this.create();
+    this.bind();
   };
 
-  methods.show = function() {
-    if (_.isFunction(this.onViewBeforeShow)) {
-      // _.bind(this, this.onViewBeforeShow);
-      this.onViewBeforeShow.call(this);
+  methods.bind = function() {
+  };
+
+  methods.create = function() {
+
+    if (_.isFunction(this.onViewBeforeCreate)) {
+      this.onViewBeforeCreate.call(this);
     }
 
     var data = this.adapter.parse(this.origindata);
     this.view.render(this.viewstatus, data);
+
+    if (_.isFunction(this.onViewAfterCreate)) {
+      this.onViewAfterCreate.call(this);
+    }
+  };
+
+  methods.show = function() {
+    if (_.isFunction(this.onViewBeforeShow)) {
+      this.onViewBeforeShow.call(this);
+    }
+
     this.container.append(this.view.html);
 
     if (_.isFunction(this.onViewAfterShow)) {
-      // _.bind(this, this.onViewAfterShow);
       this.onViewAfterShow.call(this);
     }
   }
 
-  methods.onViewBeforeShow = function() {
+  methods.onViewBeforeCreate = function() {
     this.viewstatus = Dalmatian.View.STATUS_SUCCESS;
     this.origindata = {
       cities: [
@@ -108,10 +122,6 @@ Dalmatian.ViewController = (function(){
       ]
     }
   };
-
-  methods.onViewAfterShow = function() {
-
-  }
 
   _.extend(ViewController.prototype, methods);
 
@@ -126,3 +136,5 @@ var cviewcontroller = new Dalmatian.ViewController({
   view: cview,
   adapter: cadapter
 });
+
+cviewcontroller.show();
