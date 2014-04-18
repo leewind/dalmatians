@@ -3,7 +3,11 @@ var Dalmatian = Dalmatian || {};
 Dalmatian.View = (function() {
   var View = function(options) {
     this.viewid = _.uniqueId('dalmatian-view');
-    this.options = options || {};
+
+    if(options){
+      _.extend(this, options);
+    }
+    // this.options = options || {};
   }
 
   var methods = {};
@@ -129,7 +133,8 @@ Dalmatian.ViewController = (function(){
 })(window);
 
 
-var cview = new Dalmatian.View();
+var cview = new Dalmatian.View({name: 'xxx'});
+
 var cadapter = new Dalmatian.Adapter();
 
 var cviewcontroller = new Dalmatian.ViewController({
