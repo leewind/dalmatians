@@ -11,6 +11,7 @@ View.prototype.render = function(template, data) {
 
 // @description create方法创建dom
 View.prototype.create = function() {
+
   if (_.isFunction(this.onCreate)) {
     _.bind(this.onCreate, this);
   }
@@ -65,7 +66,7 @@ var Adapter = function(origin){
   this.observers = [];
 };
 
-Adapter.prototype.parse = function() {
+Adapter.prototype.parse = function(data) {
   throw Error('parse original data to view model');
 };
 
@@ -103,6 +104,8 @@ Communicator.prototype.execute = function(onSuccess, onError) {
 
 Dalmatian.Communicator = Communicator;
 
-var ViewController = function(){
-
+var ViewController = function(view){
+  this.view = view;
 }
+
+Dalmatian.ViewController = ViewController;
