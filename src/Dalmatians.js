@@ -7,7 +7,7 @@ Dalmatian.template = _.template;
 Dalmatian.selector = $;
 
 // @notation 需要写这部分内容记住留下super
-Dalmatian.inherit = function(){}
+Dalmatian.inherit = function(){};
 
 Dalmatian.Util = {
   callmethod: function(method, scope, params){
@@ -15,7 +15,7 @@ Dalmatian.Util = {
 
     if (_.isFunction(method)) method.apply(scope, params);
   }
-}
+};
 
 Dalmatian.View = (function() {
 
@@ -34,7 +34,7 @@ Dalmatian.View = (function() {
 
     // @description 从形参中获取key和value绑定在this上
     if (_.isObject(options)) _.extend(this, options);
-  }
+  };
 
   // @notation 看看是不是可以prototype用inherit来代替，至少要有$super的概念
   View.extend = _.extend;
@@ -45,7 +45,7 @@ Dalmatian.View = (function() {
   // @description template集合，根据status做template的map
   // @example
   //    { 0: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul>' }
-  methods.templateSet = {}
+  methods.templateSet = {};
 
   // @description 通过模板和数据渲染具体的View
   // @param status {enum} View的状态参数
@@ -110,7 +110,7 @@ Dalmatian.Adapter = (function() {
 
   var Adapter = function() {
     this.observers = [];
-  }
+  };
 
   var methods = {};
 
@@ -147,11 +147,11 @@ Dalmatian.Adapter = (function() {
 Dalmatian.ViewController = (function(){
 
   var ViewController = function(options){
-    if (_.property('view')(options)) throw Error('view必须在实例化的时候传入ViewController')
+    if (_.property('view')(options)) throw Error('view必须在实例化的时候传入ViewController');
 
     this.view = options.view;
     this.adapter = options.adapter;
-  }
+  };
 
   var methods = {};
 
@@ -176,7 +176,7 @@ Dalmatian.ViewController = (function(){
 
   // @override
   // @description 如果没有attach上去就append或者html，如果
-  methods.attach = function(view){}
+  methods.attach = function(view){};
 
   methods.show = function(){
     Dalmatian.Util.callmethod(this.view.onViewBeforeShow, this);
@@ -189,6 +189,6 @@ Dalmatian.ViewController = (function(){
 
   method.hide = function(){
 
-  }
+  };
 
 })(window);
