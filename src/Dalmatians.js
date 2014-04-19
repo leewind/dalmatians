@@ -9,6 +9,14 @@ Dalmatian.selector = $;
 // @notation 需要写这部分内容记住留下super
 Dalmatian.inherit = function(){}
 
+Dalmatian.Util = {
+  callmethod: function(method, scope, params){
+    scope = scope || this;
+
+    if (_.isFunction(method)) method.apply(scope, params);
+  }
+}
+
 Dalmatian.View = (function() {
 
   var View = function(options) {
@@ -100,13 +108,87 @@ Dalmatian.View = (function() {
 
 Dalmatian.Adapter = (function() {
 
-  var Adapter = function(originData) {
-
+  var Adapter = function() {
+    this.observers = [];
   }
 
   var methods = {};
 
+  // @override
+  // @description parse方法用来将datamodel转化为viewmodel，必须被重写
+  methods.parse = function() {
+    throw Error('方法必须被重写');
+  };
+
+  methods.registerObserver = function(viewcontroller) {
+    // @description 检查队列中如果没有viewcontroller，从队列尾部推入
+    if (!_.contains(this.observers, viewcontroller)) {
+      this.observers.push(viewcontroller);
+    }
+  };
+
+  methods.unregisterObserver = function(viewcontroller) {
+    // @description 从observers的队列中剔除viewcontroller
+    this.observers = _.without(this.observers, viewcontroller);
+  };
+
+  methods.notifyDataChanged = function() {
+    // @description 通知所有注册的观察者被观察者的数据发生变化
+    _.each(this.observers, function(viewcontroller){
+      if (_.isObject(viewcontroller))
+        Dalmatian.Util.callmethod(viewcontroller.update, viewcontroller);
+    });
+  };
+
   _.extend(Adapter.prototype, methods);
 
+})(window);
+
+Dalmatian.ViewController = (function(){
+
+  var ViewController = function(options){
+    if (_.property('view')(options)) throw Error('view必须在实例化的时候传入ViewController')
+
+    this.view = options.view;
+    this.adapter = options.adapter;
+  }
+
+  var methods = {};
+
+  methods.create = function(){
+    Dalmatian.Util.callmethod(this.view.onViewBeforeCreate, this);
+
+    var data = this.adapter.parse(this.origindata);
+    this.view.render(this.viewstatus, data);
+
+    Dalmatian.Util.callmethod(this.view.onViewAfterCreate, this);
+  };
+
+  methods.bind = function(){
+    Dalmatian.Util.callmethod(this.view.onViewBeforeBind, this);
+
+    // @notation Dalmatian.Event需要创建，参考Backbone
+    this.viewcontent = this.html;
+    Dalmatian.Event.on(this.viewcontent, this.events);
+
+    Dalmatian.Util.callmethod(this.view.onViewAfterBind, this);
+  };
+
+  // @override
+  // @description 如果没有attach上去就append或者html，如果
+  methods.attach = function(view){}
+
+  methods.show = function(){
+    Dalmatian.Util.callmethod(this.view.onViewBeforeShow, this);
+
+    // @description 调用attach方法将this.viewcontent贴到container
+    Dalmatian.Util.callmethod(this.attach, this, [this.viewcontent]);
+
+    Dalmatian.Util.callmethod(this.view.onViewAfterCreate, this);
+  };
+
+  method.hide = function(){
+
+  }
 
 })(window);
