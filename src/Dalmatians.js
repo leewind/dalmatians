@@ -9,18 +9,29 @@ Dalmatian.selector = $;
 // @notation 需要写这部分内容记住留下super
 var arr = [];
 var slice = arr.slice;
+
+/**
+* @description inherit方法，js的继承，默认为两个参数
+* @param {function} supClass 可选，要继承的类
+* @param {object} subProperty 被创建类的成员
+* @return {function} 被创建的类
+*/
 Dalmatian.inherit = function () {
+
+  // @description 参数检测，该继承方法，只支持一个参数创建类，或者两个参数继承类
   if (arguments.length == 0 || arguments.length > 2) throw '参数错误';
 
   var parent = null;
-  //将参数转换为数组
+
+  // @description 将参数转换为数组
   var properties = slice.call(arguments);
 
-  //如果第一个参数为类（function），那么就将之取出
+  // @description 如果第一个参数为类（function），那么就将之取出
   if (typeof properties[0] === 'function')
     parent = properties.shift();
   properties = properties[0];
 
+  // @description 创建新类用于返回
   function klass() {
     this.initialize.apply(this, arguments);
   }
@@ -29,6 +40,7 @@ Dalmatian.inherit = function () {
   klass.subclasses = [];
 
   if (parent) {
+    // @description 中间过渡类，防止parent的构造函数被执行
     var subclass = function () { };
     subclass.prototype = parent.prototype;
     klass.prototype = new subclass;
