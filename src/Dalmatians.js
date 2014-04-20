@@ -1,21 +1,34 @@
+// @description 本框架默认是以来于zepto。这里构建了基础的方法层，
+//              当用户使用其他框架时，可能需要复写这几个基础方法
+
+// @description 方法选择之后做方法调用
+function callmethod (method, scope, params) {
+  scope = scope || this;
+  if (_.isFunction(method)) method.apply(scope, params);
+};
+
+// @description
+function delegateEvent (object, action, callback) {
+  if (action) throw Error('没有为事件设定动作');
+  return object.on(action, callback);
+};
+
+// @description 选择器
+function selectDom(selector) {
+  return $(selector);
+};
+
+
+// @description 正式的声明Dalmatian框架的命名空间
 var Dalmatian = Dalmatian || {};
 
 // @description 定义默认的template方法来自于underscore
 Dalmatian.template = _.template;
 
-// @description 定义默认的选择器为$
-Dalmatian.selector = $;
-
 // @notation 需要写这部分内容记住留下super
 Dalmatian.inherit = function(){};
 
-Dalmatian.Util = {
-  callmethod: function(method, scope, params){
-    scope = scope || this;
 
-    if (_.isFunction(method)) method.apply(scope, params);
-  }
-};
 
 Dalmatian.View = (function() {
 
@@ -136,7 +149,7 @@ Dalmatian.Adapter = (function() {
     // @description 通知所有注册的观察者被观察者的数据发生变化
     _.each(this.observers, function(viewcontroller){
       if (_.isObject(viewcontroller))
-        Dalmatian.Util.callmethod(viewcontroller.update, viewcontroller);
+        callmethod(viewcontroller.update, viewcontroller);
     });
   };
 
@@ -156,22 +169,22 @@ Dalmatian.ViewController = (function(){
   var methods = {};
 
   methods.create = function(){
-    Dalmatian.Util.callmethod(this.view.onViewBeforeCreate, this);
+    callmethod(this.view.onViewBeforeCreate, this);
 
     var data = this.adapter.parse(this.origindata);
     this.view.render(this.viewstatus, data);
 
-    Dalmatian.Util.callmethod(this.view.onViewAfterCreate, this);
+    callmethod(this.view.onViewAfterCreate, this);
   };
 
   methods.bind = function(){
-    Dalmatian.Util.callmethod(this.view.onViewBeforeBind, this);
+    callmethod(this.view.onViewBeforeBind, this);
 
     // @notation Dalmatian.Event需要创建，参考Backbone
     this.viewcontent = this.html;
     Dalmatian.Event.on(this.viewcontent, this.events);
 
-    Dalmatian.Util.callmethod(this.view.onViewAfterBind, this);
+    callmethod(this.view.onViewAfterBind, this);
   };
 
   // @override
@@ -179,12 +192,12 @@ Dalmatian.ViewController = (function(){
   methods.attach = function(view){};
 
   methods.show = function(){
-    Dalmatian.Util.callmethod(this.view.onViewBeforeShow, this);
+    callmethod(this.view.onViewBeforeShow, this);
 
     // @description 调用attach方法将this.viewcontent贴到container
-    Dalmatian.Util.callmethod(this.attach, this, [this.viewcontent]);
+    callmethod(this.attach, this, [this.viewcontent]);
 
-    Dalmatian.Util.callmethod(this.view.onViewAfterCreate, this);
+    callmethod(this.view.onViewAfterCreate, this);
   };
 
   method.hide = function(){
