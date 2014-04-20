@@ -26,7 +26,79 @@ var Dalmatian = Dalmatian || {};
 Dalmatian.template = _.template;
 
 // @notation 需要写这部分内容记住留下super
-Dalmatian.inherit = function(){};
+var arr = [];
+var slice = arr.slice;
+
+/**
+* @description inherit方法，js的继承，默认为两个参数
+* @param {function} supClass 可选，要继承的类
+* @param {object} subProperty 被创建类的成员
+* @return {function} 被创建的类
+*/
+Dalmatian.inherit = function () {
+
+  // @description 参数检测，该继承方法，只支持一个参数创建类，或者两个参数继承类
+  if (arguments.length == 0 || arguments.length > 2) throw '参数错误';
+
+  var parent = null;
+
+  // @description 将参数转换为数组
+  var properties = slice.call(arguments);
+
+  // @description 如果第一个参数为类（function），那么就将之取出
+  if (typeof properties[0] === 'function')
+    parent = properties.shift();
+  properties = properties[0];
+
+  // @description 创建新类用于返回
+  function klass() {
+    this.initialize.apply(this, arguments);
+  }
+
+  klass.superclass = parent;
+  klass.subclasses = [];
+
+  if (parent) {
+    // @description 中间过渡类，防止parent的构造函数被执行
+    var subclass = function () { };
+    subclass.prototype = parent.prototype;
+    klass.prototype = new subclass;
+    parent.subclasses.push(klass);
+  }
+
+  var ancestor = klass.superclass && klass.superclass.prototype;
+  for (var k in properties) {
+    var value = properties[k];
+
+    //满足条件就重写
+    if (ancestor && typeof value == 'function') {
+      var argslist = /^\s*function\s*\(([^\(\)]*?)\)\s*?\{/i.exec(value.toString())[1].replace(/\s/i, '').split(',');
+      //只有在第一个参数为$super情况下才需要处理（是否具有重复方法需要用户自己决定）
+      if (argslist[0] === '$super' && ancestor[k]) {
+        value = (function (methodName, fn) {
+          return function () {
+            var scope = this;
+            var args = [function () {
+              return ancestor[methodName].apply(scope, arguments);
+            } ];
+            return fn.apply(this, args.concat(slice.call(arguments)));
+          };
+        })(k, value);
+      }
+    }
+
+    klass.prototype[k] = value;
+  }
+
+  if (!klass.prototype.initialize)
+    klass.prototype.initialize = function () { };
+
+  klass.prototype.constructor = klass;
+
+  return klass;
+};
+
+
 
 
 
