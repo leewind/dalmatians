@@ -89,7 +89,6 @@ Dalmatian.template = _.template;
 // @notation 需要写这部分内容记住留下super
 var arr = [];
 var slice = arr.slice;
-
 /**
 * @description inherit方法，js的继承，默认为两个参数
 * @param {function} supClass 可选，要继承的类
