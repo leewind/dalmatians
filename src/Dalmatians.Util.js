@@ -1,6 +1,7 @@
 
 /**
 * @description 静态日期操作类，封装系列日期操作方法
+* @description 输入时候月份自动减一，输出时候自动加一
 * @return {object} 返回操作方法
 */
 var dateUtil = {
@@ -39,7 +40,7 @@ var dateUtil = {
       for (var i = 0, len = arrStr.length; i < len; i++) {
         dateObj[arrStr[i]] = arr[i + 1];
       }
-      return new Date(dateObj['y'], dateObj['m'], dateObj['d']);
+      return new Date(dateObj['y'], dateObj['m'] - 1, dateObj['d']);
     }
     return null;
   },
@@ -92,6 +93,8 @@ var dateUtil = {
   // @param year {num} 月份
   // @return {num} 返回天数
   getDaysOfMonth: function (year, month) {
+    //自动减一以便操作
+    month--;
     if (dateUtil.isDate(year)) {
       month = year.getMonth(); //注意此处月份要加1，所以我们要减一
       year = year.getFullYear();
@@ -104,8 +107,10 @@ var dateUtil = {
   // @param year {num} 月份
   // @return {num} 当月一号为星期几0-6
   getBeginDayOfMouth: function (year, month) {
+    //自动减一以便操作
+    month--;
     if ((typeof year == 'object') && (year instanceof Date)) {
-      month = year.getMonth(); //注意此处月份要加1
+      month = year.getMonth(); 
       year = year.getFullYear();
     }
     var d = new Date(year, month, 1);
