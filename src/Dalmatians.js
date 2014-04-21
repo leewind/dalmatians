@@ -1,5 +1,4 @@
-// @description 本框架默认是以来于zepto。这里构建了基础的方法层，
-//              当用户使用其他框架时，可能需要复写这几个基础方法
+// @notation 本框架默认是以来于zepto。这里构建了基础的方法层,当用户使用其他框架时，可能需要复写这几个基础方法
 
 // @description 方法选择之后做方法调用
 function callmethod (method, scope, params) {
@@ -7,10 +6,41 @@ function callmethod (method, scope, params) {
   if (_.isFunction(method)) method.apply(scope, params);
 };
 
-// @description
-function delegateEvent (object, action, callback) {
-  if (action) throw Error('没有为事件设定动作');
-  return object.on(action, callback);
+// ----------------------------------------------------
+// @notation 从backbone中借鉴而来
+
+// Regular expression used to split event strings.
+var eventSplitter = /\s+/;
+
+// Implement fancy features of the Events API such as multiple event
+// names `"change blur"` and jQuery-style event maps `{change: action}`
+// in terms of the existing API.
+var eventparser = function(obj, action, name, rest) {
+  if (!name) return true;
+
+  // Handle event maps.
+  if (typeof name === 'object') {
+    for (var key in name) {
+      obj[action].apply(obj, [key, name[key]].concat(rest));
+    }
+    return false;
+  }
+
+  // Handle space separated event names.
+  if (eventSplitter.test(name)) {
+    var names = name.split(eventSplitter);
+    for (var i = 0, length = names.length; i < length; i++) {
+      obj[action].apply(obj, [names[i]].concat(rest));
+    }
+    return false;
+  }
+
+  return true;
+};
+// ----------------------------------------------------
+
+function eventmethod (object, action, name, callback) {
+
 };
 
 // @description 选择器
@@ -18,6 +48,8 @@ function selectDom(selector) {
   return $(selector);
 };
 
+// --------------------------------------------------- //
+// ------------------华丽的分割线--------------------- //
 
 // @description 正式的声明Dalmatian框架的命名空间
 var Dalmatian = Dalmatian || {};
@@ -97,10 +129,6 @@ Dalmatian.inherit = function () {
 
   return klass;
 };
-
-
-
-
 
 Dalmatian.View = (function() {
 
@@ -254,7 +282,7 @@ Dalmatian.ViewController = (function(){
 
     // @notation Dalmatian.Event需要创建，参考Backbone
     this.viewcontent = this.html;
-    Dalmatian.Event.on(this.viewcontent, this.events);
+    // Dalmatian.Event.on(this.viewcontent, this.events);
 
     callmethod(this.view.onViewAfterBind, this);
   };
