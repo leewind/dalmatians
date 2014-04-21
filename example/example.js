@@ -1,10 +1,10 @@
 var Dalmatian = Dalmatian || {};
 
-Dalmatian.View = (function() {
-  var View = function(options) {
+Dalmatian.View = (function () {
+  var View = function (options) {
     this.viewid = _.uniqueId('dalmatian-view');
 
-    if(options){
+    if (options) {
       _.extend(this, options);
     }
     // this.options = options || {};
@@ -22,14 +22,14 @@ Dalmatian.View = (function() {
     2: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="failedBtn" disabled>失败</button></div>'
   }
 
-  methods.render = function(status, data, callback) {
+  methods.render = function (status, data, callback) {
     var templateSource = this.templateSet[status];
     if (templateSource) {
       var templateFn = _.template(templateSource);
 
-      try{
-        this.html = '<section class="view" id="'+this.viewid+'">'+templateFn(data)+'</section>';
-      }catch(e){
+      try {
+        this.html = '<section class="view" id="' + this.viewid + '">' + templateFn(data) + '</section>';
+      } catch (e) {
         throw Error('template parse error');
       }
 
