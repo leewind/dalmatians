@@ -79,7 +79,7 @@ function selectDom(selector) {
 
 function domImplement($element, action, context, param){
   if(_.isFunction($element[action]))
-    $element[action].apply(context||this, param);
+    $element[action].apply(context || $element, param)
 }
 
 // --------------------------------------------------- //
@@ -117,18 +117,19 @@ Dalmatian.inherit = function () {
 
   // @description 创建新类用于返回
   function klass() {
-    this.initialize.apply(this, arguments);
+    if (_.isFunction(this.initialize))
+      this.initialize.apply(this, arguments);
   }
 
   klass.superclass = parent;
-  klass.subclasses = [];
+  // parent.subclasses = [];
 
   if (parent) {
     // @description 中间过渡类，防止parent的构造函数被执行
     var subclass = function () { };
     subclass.prototype = parent.prototype;
     klass.prototype = new subclass;
-    parent.subclasses.push(klass);
+    // parent.subclasses.push(klass);
   }
 
   var ancestor = klass.superclass && klass.superclass.prototype;
@@ -168,26 +169,29 @@ Dalmatian.View = (function() {
   var DEFAULT_CONTAINER_TEMPLATE = '<section class="view" id="<%=viewid%>"><%=html%></section>';
 
   var View = function(options) {
-    // @description view的唯一id
-    this.viewid = _.uniqueId('dalmatian-view-');
-
-     // @description 默认的view的外壳，class定义为view，id为view的唯一id
-    this.defaultContainerTemplate = this.defaultContainerTemplate || DEFAULT_CONTAINER_TEMPLATE;
-
-    // @override
-    // @description View的状态定义
-    // @example
-    //    { STATUS_SUCCESS: 0 }
-    this.statusSet = {};
-
     // @description 从形参中获取key和value绑定在this上
     if (_.isObject(options)) _.extend(this, options);
+
+    this.initialize();
   };
 
   // @notation 看看是不是可以prototype用inherit来代替，至少要有$super的概念
-  View.extend = _.extend;
+  // View.extend = _.extend;
 
   var methods = {};
+
+  methods.initialize = function(){
+    // @description view的唯一id
+    this.viewid = _.uniqueId('dalmatian-view-');
+  };
+
+  // @override
+  // @description View的状态定义
+  // @example
+  //    { STATUS_SUCCESS: 0 }
+  methods.statusSet = {};
+
+  methods.defaultContainerTemplate = DEFAULT_CONTAINER_TEMPLATE;
 
   // @override
   // @description template集合，根据status做template的map
@@ -256,11 +260,15 @@ Dalmatian.View = (function() {
 
 Dalmatian.Adapter = (function() {
 
-  var Adapter = function() {
-    this.observers = [];
+  var Adapter = function(options) {
+    if (_.isObject(options)) _.extend(this, options);
   };
 
   var methods = {};
+
+  methods.initialize = function(){
+    this.observers = [];
+  };
 
   // @override
   // @description parse方法用来将datamodel转化为viewmodel，必须被重写
@@ -290,34 +298,43 @@ Dalmatian.Adapter = (function() {
 
   _.extend(Adapter.prototype, methods);
 
+  return Adapter;
+
 })(window);
 
 Dalmatian.ViewController = (function(){
 
   var ViewController = function(options){
-    if (_.property('view')(options)) throw Error('view必须在实例化的时候传入ViewController');
+    if (!_.property('view')(options)) throw Error('view必须在实例化的时候传入ViewController');
 
-    this.view = options.view;
-    this.adapter = options.adapter;
+    // @description 从形参中获取key和value绑定在this上
+    if (_.isObject(options)) _.extend(this, options);
+
+    this.initialize();
   };
 
   var methods = {};
+
+  methods.initialize = function(){
+    this.create();
+    this.bind();
+  };
 
   methods.parseEvents = function() {
     // @notation 解析event，返回对象{events: [{target: '#btn', event:'click', callback: handler}]}
   };
 
   methods.create = function(){
-    callmethod(this.view.onViewBeforeCreate, this);
+    callmethod(this.onViewBeforeCreate, this);
 
     var data = this.adapter.parse(this.origindata);
     this.view.render(this.viewstatus, data);
 
-    callmethod(this.view.onViewAfterCreate, this);
+    callmethod(this.onViewAfterCreate, this);
   };
 
   methods.bind = function(){
-    callmethod(this.view.onViewBeforeBind, this);
+    callmethod(this.onViewBeforeBind, this);
 
     this.viewcontent = this.view.html;
 
@@ -328,50 +345,54 @@ Dalmatian.ViewController = (function(){
       eventmethod (item.target, 'on', item.event, item.callback, scope);
     });
 
-    callmethod(this.view.onViewAfterBind, this);
+    callmethod(this.onViewAfterBind, this);
   };
 
   methods.show = function(){
-    callmethod(this.view.onViewBeforeShow, this);
+    callmethod(this.onViewBeforeShow, this);
 
-    var $element = selectDom('#'+this.view.id);
+    var $element = selectDom('#'+this.view.viewid);
 
     if ((!$element || $element.length === 0) && this.viewcontent) {
       var $container = selectDom(this.container);
-      domImplement($container, 'html', this, [this.viewcontent]);
+      domImplement($container, 'html', false, [this.viewcontent]);
     };
 
     domImplement($element, 'show');
 
 
-    callmethod(this.view.onViewAfterCreate, this);
+    callmethod(this.onViewAfterShow, this);
   };
 
   methods.hide = function(){
-    callmethod(this.view.onViewBeforeHide, this);
+    callmethod(this.onViewBeforeHide, this);
 
-    var $element = selectDom('#'+this.view.id);
+    var $element = selectDom('#'+this.view.viewid);
     domImplement($element, 'hide');
 
-    callmethod(this.view.onViewAfterHide, this);
+    callmethod(this.onViewAfterHide, this);
   };
 
   methods.forze = function(){
-    callmethod(this.view.onViewBeforeForzen, this);
+    callmethod(this.onViewBeforeForzen, this);
 
-    var $element = selectDom('#'+this.view.id);
+    var $element = selectDom('#'+this.view.viewid);
     domImplement($element, 'off');
 
-    callmethod(this.view.onViewAfterForzen, this);
+    callmethod(this.onViewAfterForzen, this);
   };
 
   methods.destory = function(){
-    callmethod(this.view.onViewBeforeDestory, this);
+    callmethod(this.onViewBeforeDestory, this);
 
-    var $element = selectDom('#'+this.view.id).remove();
+    var $element = selectDom('#'+this.view.viewid).remove();
     domImplement($element, 'remove');
 
-    callmethod(this.view.onViewAfterDestory, this);
+    callmethod(this.onViewAfterDestory, this);
   };
+
+  _.extend(ViewController.prototype, methods);
+
+  return ViewController;
 
 })(window);
