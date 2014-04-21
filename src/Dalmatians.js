@@ -7,7 +7,7 @@ function callmethod (method, scope, params) {
 };
 
 // ----------------------------------------------------
-// @notation 从backbone中借鉴而来
+// @notation 从backbone中借鉴而来，用来多事件绑定的events
 
 // Regular expression used to split event strings.
 var eventSplitter = /\s+/;
@@ -15,7 +15,7 @@ var eventSplitter = /\s+/;
 // Implement fancy features of the Events API such as multiple event
 // names `"change blur"` and jQuery-style event maps `{change: action}`
 // in terms of the existing API.
-var eventparser = function(obj, action, name, rest) {
+var eventoperator = function(obj, action, name, rest) {
   if (!name) return true;
 
   // Handle event maps.
@@ -39,7 +39,36 @@ var eventparser = function(obj, action, name, rest) {
 };
 // ----------------------------------------------------
 
-function eventmethod (object, action, name, callback) {
+// @notation 默认使用zepto的事件委托机制
+function eventmethod (obj, action, name, callback, context) {
+  callback = _.bind(callback, context||this);
+
+  var delegate = function(target, eventName, eventCallback){
+    target.on(eventName, eventCallback);
+  };
+
+  var undelegate = function(target, eventName, eventCallback){
+    target.off(eventName, eventCallback);
+  };
+
+  var trigger = function(target, eventName) {
+    target.trigger(eventName);
+  };
+
+  var map = {
+    'on': delegate,
+    'bind': delegate,
+    'off': undelegate,
+    'unbind': undelegate,
+    'trigger': trigger
+  };
+
+  // @notation 需要验证，有问题！
+  if (!eventmethod(map, action, name, [callback, context]) || !callback) return this;
+
+  if (_.isFunction(map[action])) {
+    map[action](obj|| $, name, callback);
+  }
 
 };
 
@@ -131,12 +160,14 @@ Dalmatian.inherit = function () {
 
 Dalmatian.View = (function() {
 
+  var DEFAULT_CONTAINER_TEMPLATE = '<section class="view" id="<%=viewid%>"><%=html%></section>';
+
   var View = function(options) {
     // @description view的唯一id
     this.viewid = _.uniqueId('dalmatian-view-');
 
      // @description 默认的view的外壳，class定义为view，id为view的唯一id
-    this.defaultContainerTemplate = this.defaultContainerTemplate || '<section class="view" id="<%=viewid%>"><%=html%></section>';
+    this.defaultContainerTemplate = this.defaultContainerTemplate || DEFAULT_CONTAINER_TEMPLATE;
 
     // @override
     // @description View的状态定义
@@ -267,6 +298,10 @@ Dalmatian.ViewController = (function(){
 
   var methods = {};
 
+  methods.parseEvents = function() {
+    // @notation 解析event，返回对象{events: [{target: '#btn', event:'click', callback: handler}]}
+  };
+
   methods.create = function(){
     callmethod(this.view.onViewBeforeCreate, this);
 
@@ -279,9 +314,14 @@ Dalmatian.ViewController = (function(){
   methods.bind = function(){
     callmethod(this.view.onViewBeforeBind, this);
 
-    // @notation Dalmatian.Event需要创建，参考Backbone
     this.viewcontent = this.html;
-    // Dalmatian.Event.on(this.viewcontent, this.events);
+
+    var eventsList = this.parseEvents(this.events);
+
+    var scope = this;
+    _.each(eventsList, function(item) {
+      eventmethod (item.target, 'on', item.event, item.callback, scope);
+    });
 
     callmethod(this.view.onViewAfterBind, this);
   };
