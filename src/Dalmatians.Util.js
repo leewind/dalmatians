@@ -1,26 +1,27 @@
-
+ï»¿
 /**
-* @description ¾²Ì¬ÈÕÆÚ²Ù×÷Àà£¬·â×°ÏµÁĞÈÕÆÚ²Ù×÷·½·¨
-* @return {object} ·µ»Ø²Ù×÷·½·¨
+* @description é™æ€æ—¥æœŸæ“ä½œç±»ï¼Œå°è£…ç³»åˆ—æ—¥æœŸæ“ä½œæ–¹æ³•
+* @description è¾“å…¥æ—¶å€™æœˆä»½è‡ªåŠ¨å‡ä¸€ï¼Œè¾“å‡ºæ—¶å€™è‡ªåŠ¨åŠ ä¸€
+* @return {object} è¿”å›æ“ä½œæ–¹æ³•
 */
 var dateUtil = {
   /**
-  * @description Êı×Ö²Ù×÷£¬
-  * @return {string} ·µ»Ø´¦ÀíºóµÄÊı×Ö
+  * @description æ•°å­—æ“ä½œï¼Œ
+  * @return {string} è¿”å›å¤„ç†åçš„æ•°å­—
   */
   formatNum: function (n) {
     if (n < 10) return '0' + n;
     return n;
   },
   /**
-  * @description ½«×Ö·û´®×ª»»ÎªÈÕÆÚ£¬Ö§³Ö¸ñÊ½y-m-d ymd (y m r)ÒÔ¼°±ê×¼µÄ
-  * @return {Date} ·µ»ØÈÕÆÚ¶ÔÏó
+  * @description å°†å­—ç¬¦ä¸²è½¬æ¢ä¸ºæ—¥æœŸï¼Œæ”¯æŒæ ¼å¼y-m-d ymd (y m r)ä»¥åŠæ ‡å‡†çš„
+  * @return {Date} è¿”å›æ—¥æœŸå¯¹è±¡
   */
   parse: function (dateStr, formatStr) {
     if (typeof dateStr === 'undefined') return null;
     if (typeof formatStr === 'string') {
       var _d = new Date(formatStr);
-      //Ê×ÏÈÈ¡µÃË³ĞòÏà¹Ø×Ö·û´®
+      //é¦–å…ˆå–å¾—é¡ºåºç›¸å…³å­—ç¬¦ä¸²
       var arrStr = formatStr.replace(/[^ymd]/g, '').split('');
       if (!arrStr && arrStr.length != 3) return null;
 
@@ -39,20 +40,20 @@ var dateUtil = {
       for (var i = 0, len = arrStr.length; i < len; i++) {
         dateObj[arrStr[i]] = arr[i + 1];
       }
-      return new Date(dateObj['y'], dateObj['m'], dateObj['d']);
+      return new Date(dateObj['y'], dateObj['m'] - 1, dateObj['d']);
     }
     return null;
   },
   /**
-  * @description½«ÈÕÆÚ¸ñÊ½»¯Îª×Ö·û´®
-  * @return {string} ³£ÓÃ¸ñÊ½»¯×Ö·û´®
+  * @descriptionå°†æ—¥æœŸæ ¼å¼åŒ–ä¸ºå­—ç¬¦ä¸²
+  * @return {string} å¸¸ç”¨æ ¼å¼åŒ–å­—ç¬¦ä¸²
   */
   format: function (date, format) {
     if (arguments.length < 2 && !date.getTime) {
       format = date;
       date = new Date();
     }
-    typeof format != 'string' && (format = 'YÄêMÔÂDÈÕ HÊ±F·ÖSÃë');
+    typeof format != 'string' && (format = 'Yå¹´MæœˆDæ—¥ Hæ—¶Fåˆ†Sç§’');
     return format.replace(/Y|y|M|m|D|d|H|h|F|f|S|s/g, function (a) {
       switch (a) {
         case "y": return (date.getFullYear() + "").slice(2);
@@ -70,42 +71,46 @@ var dateUtil = {
       }
     });
   },
-  // @description ÊÇ·ñÎªÎªÈÕÆÚ¶ÔÏó£¬¸Ã·½·¨¿ÉÄÜÓĞ¿Ó£¬Ê¹ÓÃĞèÒªÉ÷ÖØ
-  // @param year {num} ÈÕÆÚ¶ÔÏó
-  // @return {boolean} ·µ»ØÖµ
+  // @description æ˜¯å¦ä¸ºä¸ºæ—¥æœŸå¯¹è±¡ï¼Œè¯¥æ–¹æ³•å¯èƒ½æœ‰å‘ï¼Œä½¿ç”¨éœ€è¦æ…é‡
+  // @param year {num} æ—¥æœŸå¯¹è±¡
+  // @return {boolean} è¿”å›å€¼
   isDate: function (d) {
     if ((typeof d == 'object') && (d instanceof Date)) return true;
     return false;
   },
-  // @description ÊÇ·ñÎªÈòÄê
-  // @param year {num} ¿ÉÄÜÊÇÄê·İ»òÕßÎªÒ»¸ödateÊ±¼ä
-  // @return {boolean} ·µ»ØÖµ
+  // @description æ˜¯å¦ä¸ºé—°å¹´
+  // @param year {num} å¯èƒ½æ˜¯å¹´ä»½æˆ–è€…ä¸ºä¸€ä¸ªdateæ—¶é—´
+  // @return {boolean} è¿”å›å€¼
   isLeapYear: function (year) {
-    //´«ÈëÎªÊ±¼ä¸ñÊ½ĞèÒª´¦Àí
+    //ä¼ å…¥ä¸ºæ—¶é—´æ ¼å¼éœ€è¦å¤„ç†
     if (dateUtil.isDate(year)) year = year.getFullYear()
     if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) return true;
     else return false;
   },
 
-  // @description »ñÈ¡Ò»¸öÔÂ·İµÄÌìÊı
-  // @param year {num} ¿ÉÄÜÊÇÄê·İ»òÕßÎªÒ»¸ödateÊ±¼ä
-  // @param year {num} ÔÂ·İ
-  // @return {num} ·µ»ØÌìÊı
+  // @description è·å–ä¸€ä¸ªæœˆä»½çš„å¤©æ•°
+  // @param year {num} å¯èƒ½æ˜¯å¹´ä»½æˆ–è€…ä¸ºä¸€ä¸ªdateæ—¶é—´
+  // @param year {num} æœˆä»½
+  // @return {num} è¿”å›å¤©æ•°
   getDaysOfMonth: function (year, month) {
+    //è‡ªåŠ¨å‡ä¸€ä»¥ä¾¿æ“ä½œ
+    month--;
     if (dateUtil.isDate(year)) {
-      month = year.getMonth(); //×¢Òâ´Ë´¦ÔÂ·İÒª¼Ó1£¬ËùÒÔÎÒÃÇÒª¼õÒ»
+      month = year.getMonth(); //æ³¨æ„æ­¤å¤„æœˆä»½è¦åŠ 1ï¼Œæ‰€ä»¥æˆ‘ä»¬è¦å‡ä¸€
       year = year.getFullYear();
     }
     return [31, dateUtil.isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
   },
 
-  // @description »ñÈ¡Ò»¸öÔÂ·İ1ºÅÊÇĞÇÆÚ¼¸£¬×¢Òâ´ËÊ±µÄÔÂ·İ´«ÈëÊ±ĞèÒª×ÔÖ÷¼õÒ»
-  // @param year {num} ¿ÉÄÜÊÇÄê·İ»òÕßÎªÒ»¸ödateÊ±¼ä
-  // @param year {num} ÔÂ·İ
-  // @return {num} µ±ÔÂÒ»ºÅÎªĞÇÆÚ¼¸0-6
+  // @description è·å–ä¸€ä¸ªæœˆä»½1å·æ˜¯æ˜ŸæœŸå‡ ï¼Œæ³¨æ„æ­¤æ—¶çš„æœˆä»½ä¼ å…¥æ—¶éœ€è¦è‡ªä¸»å‡ä¸€
+  // @param year {num} å¯èƒ½æ˜¯å¹´ä»½æˆ–è€…ä¸ºä¸€ä¸ªdateæ—¶é—´
+  // @param year {num} æœˆä»½
+  // @return {num} å½“æœˆä¸€å·ä¸ºæ˜ŸæœŸå‡ 0-6
   getBeginDayOfMouth: function (year, month) {
+    //è‡ªåŠ¨å‡ä¸€ä»¥ä¾¿æ“ä½œ
+    month--;
     if ((typeof year == 'object') && (year instanceof Date)) {
-      month = year.getMonth(); //×¢Òâ´Ë´¦ÔÂ·İÒª¼Ó1
+      month = year.getMonth(); 
       year = year.getFullYear();
     }
     var d = new Date(year, month, 1);
