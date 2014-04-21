@@ -4,7 +4,7 @@
 function callmethod (method, scope, params) {
   scope = scope || this;
   if (_.isFunction(method)) method.apply(scope, params);
-};
+}
 
 // ----------------------------------------------------
 // @notation 从backbone中借鉴而来，用来多事件绑定的events
@@ -70,16 +70,16 @@ function eventmethod (obj, action, name, callback, context) {
     map[action](obj|| $, name, callback);
   }
 
-};
+}
 
 // @description 选择器
 function selectDom(selector) {
   return $(selector);
-};
+}
 
 function domImplement($element, action, context, param){
   if(_.isFunction($element[action]))
-    $element[action].apply(context || $element, param)
+    $element[action].apply(context || $element, param);
 }
 
 // --------------------------------------------------- //
@@ -103,7 +103,7 @@ var slice = arr.slice;
 Dalmatian.inherit = function () {
 
   // @description 参数检测，该继承方法，只支持一个参数创建类，或者两个参数继承类
-  if (arguments.length == 0 || arguments.length > 2) throw '参数错误';
+  if (arguments.length === 0 || arguments.length > 2) throw '参数错误';
 
   var parent = null;
 
@@ -128,7 +128,7 @@ Dalmatian.inherit = function () {
     // @description 中间过渡类，防止parent的构造函数被执行
     var subclass = function () { };
     subclass.prototype = parent.prototype;
-    klass.prototype = new subclass;
+    klass.prototype = new subclass();
     // parent.subclasses.push(klass);
   }
 
@@ -356,7 +356,7 @@ Dalmatian.ViewController = (function(){
     if ((!$element || $element.length === 0) && this.viewcontent) {
       var $container = selectDom(this.container);
       domImplement($container, 'html', false, [this.viewcontent]);
-    };
+    }
 
     domImplement($element, 'show');
 
