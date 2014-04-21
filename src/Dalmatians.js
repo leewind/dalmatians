@@ -78,8 +78,6 @@ function selectDom(selector) {
 };
 
 function domImplement($element, action, context, param){
-  var map = $element;
-
   if(_.isFunction($element[action]))
     $element[action].apply(context||this, param);
 }
