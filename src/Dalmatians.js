@@ -77,6 +77,13 @@ function selectDom(selector) {
   return $(selector);
 };
 
+function domImplement($element, action, context, param){
+  var map = $element;
+
+  if(_.isFunction($element[action]))
+    $element[action].apply(context||this, param);
+}
+
 // --------------------------------------------------- //
 // ------------------华丽的分割线--------------------- //
 
@@ -314,7 +321,7 @@ Dalmatian.ViewController = (function(){
   methods.bind = function(){
     callmethod(this.view.onViewBeforeBind, this);
 
-    this.viewcontent = this.html;
+    this.viewcontent = this.view.html;
 
     var eventsList = this.parseEvents(this.events);
 
@@ -326,21 +333,47 @@ Dalmatian.ViewController = (function(){
     callmethod(this.view.onViewAfterBind, this);
   };
 
-  // @override
-  // @description 如果没有attach上去就append或者html，如果
-  methods.attach = function(view){};
-
   methods.show = function(){
     callmethod(this.view.onViewBeforeShow, this);
 
-    // @description 调用attach方法将this.viewcontent贴到container
-    callmethod(this.attach, this, [this.viewcontent]);
+    var $element = selectDom('#'+this.view.id);
+
+    if ((!$element || $element.length === 0) && this.viewcontent) {
+      var $container = selectDom(this.container);
+      domImplement($container, 'html', this, [this.viewcontent]);
+    };
+
+    domImplement($element, 'show');
+
 
     callmethod(this.view.onViewAfterCreate, this);
   };
 
   method.hide = function(){
+    callmethod(this.view.onViewBeforeHide, this);
 
+    var $element = selectDom('#'+this.view.id);
+    domImplement($element, 'hide');
+
+    callmethod(this.view.onViewAfterHide, this);
+  };
+
+  method.forze = function(){
+    callmethod(this.view.onViewBeforeForzen, this);
+
+    var $element = selectDom('#'+this.view.id);
+    domImplement($element, 'off');
+
+    callmethod(this.view.onViewAfterForzen, this);
+  };
+
+  method.destory = function(){
+    callmethod(this.view.onViewBeforeDestory, this);
+
+    var $element = selectDom('#'+this.view.id).remove();
+    domImplement($element, 'remove');
+
+    callmethod(this.view.onViewAfterDestory, this);
   };
 
 })(window);
