@@ -1,10 +1,61 @@
+// @notation 本框架默认是以来于zepto。这里构建了基础的方法层,当用户使用其他框架时，可能需要复写这几个基础方法
+
+// @description 方法选择之后做方法调用
+function callmethod (method, scope, params) {
+  scope = scope || this;
+  if (_.isFunction(method)) method.apply(scope, params);
+};
+
+// ----------------------------------------------------
+// @notation 从backbone中借鉴而来
+
+// Regular expression used to split event strings.
+var eventSplitter = /\s+/;
+
+// Implement fancy features of the Events API such as multiple event
+// names `"change blur"` and jQuery-style event maps `{change: action}`
+// in terms of the existing API.
+var eventparser = function(obj, action, name, rest) {
+  if (!name) return true;
+
+  // Handle event maps.
+  if (typeof name === 'object') {
+    for (var key in name) {
+      obj[action].apply(obj, [key, name[key]].concat(rest));
+    }
+    return false;
+  }
+
+  // Handle space separated event names.
+  if (eventSplitter.test(name)) {
+    var names = name.split(eventSplitter);
+    for (var i = 0, length = names.length; i < length; i++) {
+      obj[action].apply(obj, [names[i]].concat(rest));
+    }
+    return false;
+  }
+
+  return true;
+};
+// ----------------------------------------------------
+
+function eventmethod (object, action, name, callback) {
+
+};
+
+// @description 选择器
+function selectDom(selector) {
+  return $(selector);
+};
+
+// --------------------------------------------------- //
+// ------------------华丽的分割线--------------------- //
+
+// @description 正式的声明Dalmatian框架的命名空间
 var Dalmatian = Dalmatian || {};
 
 // @description 定义默认的template方法来自于underscore
 Dalmatian.template = _.template;
-
-// @description 定义默认的选择器为$
-Dalmatian.selector = $;
 
 // @notation 需要写这部分内容记住留下super
 var arr = [];
@@ -76,16 +127,6 @@ Dalmatian.inherit = function () {
   klass.prototype.constructor = klass;
 
   return klass;
-};
-
-
-
-Dalmatian.Util = {
-  callmethod: function(method, scope, params){
-    scope = scope || this;
-
-    if (_.isFunction(method)) method.apply(scope, params);
-  }
 };
 
 Dalmatian.View = (function() {
@@ -207,7 +248,7 @@ Dalmatian.Adapter = (function() {
     // @description 通知所有注册的观察者被观察者的数据发生变化
     _.each(this.observers, function(viewcontroller){
       if (_.isObject(viewcontroller))
-        Dalmatian.Util.callmethod(viewcontroller.update, viewcontroller);
+        callmethod(viewcontroller.update, viewcontroller);
     });
   };
 
@@ -227,22 +268,22 @@ Dalmatian.ViewController = (function(){
   var methods = {};
 
   methods.create = function(){
-    Dalmatian.Util.callmethod(this.view.onViewBeforeCreate, this);
+    callmethod(this.view.onViewBeforeCreate, this);
 
     var data = this.adapter.parse(this.origindata);
     this.view.render(this.viewstatus, data);
 
-    Dalmatian.Util.callmethod(this.view.onViewAfterCreate, this);
+    callmethod(this.view.onViewAfterCreate, this);
   };
 
   methods.bind = function(){
-    Dalmatian.Util.callmethod(this.view.onViewBeforeBind, this);
+    callmethod(this.view.onViewBeforeBind, this);
 
     // @notation Dalmatian.Event需要创建，参考Backbone
     this.viewcontent = this.html;
-    Dalmatian.Event.on(this.viewcontent, this.events);
+    // Dalmatian.Event.on(this.viewcontent, this.events);
 
-    Dalmatian.Util.callmethod(this.view.onViewAfterBind, this);
+    callmethod(this.view.onViewAfterBind, this);
   };
 
   // @override
@@ -250,12 +291,12 @@ Dalmatian.ViewController = (function(){
   methods.attach = function(view){};
 
   methods.show = function(){
-    Dalmatian.Util.callmethod(this.view.onViewBeforeShow, this);
+    callmethod(this.view.onViewBeforeShow, this);
 
     // @description 调用attach方法将this.viewcontent贴到container
-    Dalmatian.Util.callmethod(this.attach, this, [this.viewcontent]);
+    callmethod(this.attach, this, [this.viewcontent]);
 
-    Dalmatian.Util.callmethod(this.view.onViewAfterCreate, this);
+    callmethod(this.view.onViewAfterCreate, this);
   };
 
   method.hide = function(){
