@@ -347,7 +347,7 @@ Dalmatian.ViewController = (function(){
     callmethod(this.view.onViewAfterCreate, this);
   };
 
-  method.hide = function(){
+  methods.hide = function(){
     callmethod(this.view.onViewBeforeHide, this);
 
     var $element = selectDom('#'+this.view.id);
@@ -356,7 +356,7 @@ Dalmatian.ViewController = (function(){
     callmethod(this.view.onViewAfterHide, this);
   };
 
-  method.forze = function(){
+  methods.forze = function(){
     callmethod(this.view.onViewBeforeForzen, this);
 
     var $element = selectDom('#'+this.view.id);
@@ -365,7 +365,7 @@ Dalmatian.ViewController = (function(){
     callmethod(this.view.onViewAfterForzen, this);
   };
 
-  method.destory = function(){
+  methods.destory = function(){
     callmethod(this.view.onViewBeforeDestory, this);
 
     var $element = selectDom('#'+this.view.id).remove();
