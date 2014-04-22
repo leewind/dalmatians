@@ -302,6 +302,30 @@ Dalmatian.Adapter = (function() {
 
 })(window);
 
+/**
+ * @description 在fn方法的前后通过键值设置两个传入的回调
+ * @param fn {function} 调用的方法
+ * @param beforeFnKey {string} 从context对象中获得的函数指针的键值，该函数在fn前执行
+ * @param afterFnKey {string} 从context对象中获得的函数指针的键值，该函数在fn后执行
+ * @param context {object} 执行环节的上下文
+ * @return {function}
+ */
+function wrapmethod (fn, beforeFnKey, afterFnKey, context) {
+
+  var scope = context || this;
+  var action = _.wrap(fn, function(func) {
+    callmethod(scope[beforeFnKey], scope);
+
+    func.call(scope);
+
+    callmethod(scope[afterFnKey], scope);
+  });
+
+  _.bind(action, scope);
+
+  return action;
+}
+
 Dalmatian.ViewController = (function(){
 
   var ViewController = function(options){
@@ -324,18 +348,17 @@ Dalmatian.ViewController = (function(){
     // @notation 解析event，返回对象{events: [{target: '#btn', event:'click', callback: handler}]}
   };
 
-  methods.create = function(){
-    callmethod(this.onViewBeforeCreate, this);
-
+  methods._create = function() {
     var data = this.adapter.parse(this.origindata);
     this.view.render(this.viewstatus, data);
-
-    callmethod(this.onViewAfterCreate, this);
   };
 
-  methods.bind = function(){
-    callmethod(this.onViewBeforeBind, this);
+  methods.create = function(){
+    // @notation 在create方法调用前后设置onViewBeforeCreate和onViewAfterCreate两个回调
+    wrapmethod(this._create, 'onViewBeforeCreate', 'onViewAfterCreate', this).call(this);
+  };
 
+  methods._bind = function(){
     this.viewcontent = this.view.html;
 
     var eventsList = this.parseEvents(this.events);
@@ -344,13 +367,13 @@ Dalmatian.ViewController = (function(){
     _.each(eventsList, function(item) {
       eventmethod (item.target, 'on', item.event, item.callback, scope);
     });
-
-    callmethod(this.onViewAfterBind, this);
   };
 
-  methods.show = function(){
-    callmethod(this.onViewBeforeShow, this);
+  methods.bind = function(){
+    wrapmethod(this._bind, 'onViewBeforeBind', 'onViewAfterBind', this).call(this);
+  };
 
+  methods._show = function() {
     var $element = selectDom('#'+this.view.viewid);
 
     if ((!$element || $element.length === 0) && this.viewcontent) {
@@ -359,36 +382,37 @@ Dalmatian.ViewController = (function(){
     }
 
     domImplement($element, 'show');
+  };
 
+  methods.show = function(){
+    wrapmethod(this._show, 'onViewBeforeShow', 'onViewAfterShow', this).call(this);
+  };
 
-    callmethod(this.onViewAfterShow, this);
+  methods._hide = function() {
+    var $element = selectDom('#'+this.view.viewid);
+    domImplement($element, 'hide');
   };
 
   methods.hide = function(){
-    callmethod(this.onViewBeforeHide, this);
+    wrapmethod(this._hide, 'onViewBeforeHide', 'onViewAfterHide', this).call(this);
+  };
 
+  methods._forze = function(){
     var $element = selectDom('#'+this.view.viewid);
-    domImplement($element, 'hide');
-
-    callmethod(this.onViewAfterHide, this);
+    domImplement($element, 'off');
   };
 
   methods.forze = function(){
-    callmethod(this.onViewBeforeForzen, this);
+    wrapmethod(this._forze, 'onViewBeforeForzen', 'onViewAfterForzen', this).call(this);
+  };
 
-    var $element = selectDom('#'+this.view.viewid);
-    domImplement($element, 'off');
-
-    callmethod(this.onViewAfterForzen, this);
+  methods._destory = function(){
+    var $element = selectDom('#'+this.view.viewid).remove();
+    domImplement($element, 'remove');
   };
 
   methods.destory = function(){
-    callmethod(this.onViewBeforeDestory, this);
-
-    var $element = selectDom('#'+this.view.viewid).remove();
-    domImplement($element, 'remove');
-
-    callmethod(this.onViewAfterDestory, this);
+    wrapmethod(this._destory, 'onViewBeforeDestory', 'onViewAfterDestory', this).call(this);
   };
 
   _.extend(ViewController.prototype, methods);
