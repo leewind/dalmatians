@@ -361,19 +361,19 @@ Dalmatian.ViewController = (function () {
     //注意，此处做简单的字符串数据解析即可，不做实际业务
     for (var key in events) {
       var method = events[key];
-      if (!_.isFunction(method)) method = this[events[key]];
+      if (!_.isFunction(method)) method = this.view[events[key]];
       if (!method) continue;
 
       var match = key.match(delegateEventSplitter);
       var eventName = match[1], selector = match[2];
-      method = _.bind(method, this);
-      eventName += '.delegateEvents' + this.cid;
+      method = _.bind(method, this.view);
+      eventName += '.delegateEvents' + this.view.viewid;
       eventArr.push({
         target: selector,
         event: eventName,
         method: method
       });
-    }
+    } 
     return eventArr;
   };
 
