@@ -1,5 +1,9 @@
 // @notation 本框架默认是以来于zepto。这里构建了基础的方法层,当用户使用其他框架时，可能需要复写这几个基础方法
 
+// @description 解析event参数的正则
+var delegateEventSplitter = /^(\S+)\s*(.*)$/;
+
+
 // @description 方法选择之后做方法调用
 function callmethod (method, scope, params) {
   scope = scope || this;
@@ -326,9 +330,9 @@ function wrapmethod (fn, beforeFnKey, afterFnKey, context) {
   return action;
 }
 
-Dalmatian.ViewController = (function(){
+Dalmatian.ViewController = (function () {
 
-  var ViewController = function(options){
+  var ViewController = function (options) {
     if (!_.property('view')(options)) throw Error('view必须在实例化的时候传入ViewController');
 
     // @description 从形参中获取key和value绑定在this上
@@ -339,42 +343,67 @@ Dalmatian.ViewController = (function(){
 
   var methods = {};
 
-  methods.initialize = function(){
+  methods.initialize = function () {
     this.create();
     this.bind();
   };
 
-  methods.parseEvents = function() {
-    // @notation 解析event，返回对象{events: [{target: '#btn', event:'click', callback: handler}]}
+  /**
+  * @description 传入事件对象，解析之，解析event，返回对象{events: [{target: '#btn', event:'click', callback: handler}]}
+  * @param events {obj} 事件对象，默认传入唯一id
+  * @param namespace 事件命名空间
+  * @return {obj}
+  */
+  methods.parseEvents = function (events) {
+
+    //用于返回的事件对象
+    var eventArr = {};
+    //注意，此处做简单的字符串数据解析即可，不做实际业务
+    for (var key in events) {
+      var method = events[key];
+      if (!_.isFunction(method)) method = this[events[key]];
+      if (!method) continue;
+
+      var match = key.match(delegateEventSplitter);
+      var eventName = match[1], selector = match[2];
+      method = _.bind(method, this);
+      eventName += '.delegateEvents' + this.cid;
+      eventArr.push({
+        target: selector,
+        event: eventName,
+        method: method
+      });
+    }
+    return eventArr;
   };
 
-  methods._create = function() {
+  methods._create = function () {
     var data = this.adapter.parse(this.origindata);
     this.view.render(this.viewstatus, data);
   };
 
-  methods.create = function(){
+  methods.create = function () {
     // @notation 在create方法调用前后设置onViewBeforeCreate和onViewAfterCreate两个回调
     wrapmethod(this._create, 'onViewBeforeCreate', 'onViewAfterCreate', this).call(this);
   };
 
-  methods._bind = function(){
+  methods._bind = function () {
     this.viewcontent = this.view.html;
 
     var eventsList = this.parseEvents(this.events);
 
     var scope = this;
-    _.each(eventsList, function(item) {
-      eventmethod (item.target, 'on', item.event, item.callback, scope);
+    _.each(eventsList, function (item) {
+      eventmethod(item.target, 'on', item.event, item.callback, scope);
     });
   };
 
-  methods.bind = function(){
+  methods.bind = function () {
     wrapmethod(this._bind, 'onViewBeforeBind', 'onViewAfterBind', this).call(this);
   };
 
-  methods._show = function() {
-    var $element = selectDom('#'+this.view.viewid);
+  methods._show = function () {
+    var $element = selectDom('#' + this.view.viewid);
 
     if ((!$element || $element.length === 0) && this.viewcontent) {
       var $container = selectDom(this.container);
@@ -384,34 +413,34 @@ Dalmatian.ViewController = (function(){
     domImplement($element, 'show');
   };
 
-  methods.show = function(){
+  methods.show = function () {
     wrapmethod(this._show, 'onViewBeforeShow', 'onViewAfterShow', this).call(this);
   };
 
-  methods._hide = function() {
-    var $element = selectDom('#'+this.view.viewid);
+  methods._hide = function () {
+    var $element = selectDom('#' + this.view.viewid);
     domImplement($element, 'hide');
   };
 
-  methods.hide = function(){
+  methods.hide = function () {
     wrapmethod(this._hide, 'onViewBeforeHide', 'onViewAfterHide', this).call(this);
   };
 
-  methods._forze = function(){
-    var $element = selectDom('#'+this.view.viewid);
+  methods._forze = function () {
+    var $element = selectDom('#' + this.view.viewid);
     domImplement($element, 'off');
   };
 
-  methods.forze = function(){
+  methods.forze = function () {
     wrapmethod(this._forze, 'onViewBeforeForzen', 'onViewAfterForzen', this).call(this);
   };
 
-  methods._destory = function(){
-    var $element = selectDom('#'+this.view.viewid).remove();
+  methods._destory = function () {
+    var $element = selectDom('#' + this.view.viewid).remove();
     domImplement($element, 'remove');
   };
 
-  methods.destory = function(){
+  methods.destory = function () {
     wrapmethod(this._destory, 'onViewBeforeDestory', 'onViewAfterDestory', this).call(this);
   };
 
