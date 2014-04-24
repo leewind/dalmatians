@@ -85,6 +85,11 @@
     return function () { };
   };
 
+  method.callmethod = function (method, scope, params) {
+    scope = scope || this;
+    if (_.isFunction(method)) method.apply(scope, params);
+  };
+
   /**
   * @description 在fn方法的前后通过键值设置两个传入的回调
   * @param fn {function} 调用的方法
@@ -98,16 +103,14 @@
     var scope = context || this;
     var action = _.wrap(fn, function (func) {
 
-      _.bind(_.getNeedFn(beforeFnKey, scope), scope);
+      _.callmethod(_.getNeedFn(beforeFnKey, scope), scope);
 
       func.call(scope);
 
-      _.bind(_.getNeedFn(afterFnKey, scope), scope);
+      _.callmethod(_.getNeedFn(afterFnKey, scope), scope);
     });
 
-    _.bind(action, scope);
-
-    return action;
+    return _.callmethod(action, scope);
   }
 
 

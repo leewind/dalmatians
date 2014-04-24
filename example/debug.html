@@ -16,7 +16,7 @@
 
   <script src="../src/Dalmatians.underscore.extend.js" type="text/javascript"></script>
 
-  <script src="../src/Dalmatians01.js" type="text/javascript"></script>
+  <script src="../src/Dalmatians.js" type="text/javascript"></script>
   <!--<script type="text/javascript" src="example.js"></script>-->
 
   <script type="text/javascript">
@@ -41,20 +41,22 @@
 
       var exampleView = new ExampleView();
 
-      var ExampleAdapter = _.inherit(Dalmatian.Adapter, {
-        parse: function (origindata) {
-          return { list: origindata.cities };
-        }
-      });
-
-      var exampleAdapter = new ExampleAdapter();
-
       var origindata = {
         cities: [
           { name: '上海', id: 1 },
           { name: '北京', id: 2 }
         ]
       }
+
+      var ExampleAdapter = _.inherit(Dalmatian.Adapter, {
+        parse: function () {
+          return { list: origindata.cities };
+        }
+      });
+
+      var exampleAdapter = new ExampleAdapter();
+
+     
 
       var exampleViewController = new Dalmatian.ViewController({
         view: exampleView,
@@ -71,9 +73,10 @@
       setTimeout(function () {
         console.log('hide')
         exampleViewController.hide();
-      }, 10000);
+      }, 1000);
 
     }
   </script>
 </body>
 </html>
+
