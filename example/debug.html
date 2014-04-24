@@ -22,24 +22,21 @@
   <script type="text/javascript">
     window.onload = function () {
       var ExampleView = _.inherit(Dalmatian.View, {
-        __property__: function ($super) {
-          $super();
-          this.templateSet = {
-            0: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="cancelBtn">取消</button></div>',
-            1: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="confirmBtn">确定</button></div>',
-            2: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="failedBtn" disabled>失败</button></div>'
-          };
+      });
 
-          this.statusSet = {
-            STATUS_CANCEL: 0,
-            STATUS_SUCCESS: 1,
-            STATUS_FAIL: 2
-          };
+      var exampleView = new ExampleView({
+        templateSet: {
+          0: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="cancelBtn">取消</button></div>',
+          1: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="confirmBtn">确定</button></div>',
+          2: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="failedBtn" disabled>失败</button></div>'
+        },
+        statusSet: {
+          STATUS_CANCEL: 0,
+          STATUS_SUCCESS: 1,
+          STATUS_FAIL: 2
         }
 
       });
-
-      var exampleView = new ExampleView();
 
       var origindata = {
         cities: [
@@ -56,7 +53,7 @@
 
       var exampleAdapter = new ExampleAdapter();
 
-     
+
 
       var exampleViewController = new Dalmatian.ViewController({
         view: exampleView,
