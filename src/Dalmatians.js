@@ -211,7 +211,7 @@ Dalmatian.template = _.template;
       });
     }
   });
-  
+
   Dalmatian.ViewController = _.inherit({
     // @description 构造函数入口
     initialize: function (options) {
@@ -223,7 +223,7 @@ Dalmatian.template = _.template;
     // @override
     // @description 设置默认属性
     __property__: function () {
-      this.observers = [];
+      this.origindata = {};
     },
     // @description 操作构造函数传入操作
     handlerOption: function (options) {

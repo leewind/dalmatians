@@ -46,7 +46,7 @@
       }
 
       var ExampleAdapter = _.inherit(Dalmatian.Adapter, {
-        parse: function () {
+        parse: function (origindata) {
           return { list: origindata.cities };
         }
       });
