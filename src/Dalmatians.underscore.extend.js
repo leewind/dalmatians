@@ -1,4 +1,4 @@
-﻿(function() {
+﻿(function () {
 
   // @description 全局可能用到的变量
   var arr = [];
@@ -6,7 +6,7 @@
 
   var method = method || {};
 
-  
+
   /**
   * @description inherit方法，js的继承，默认为两个参数
   * @param {function} supClass 可选，要继承的类
@@ -77,7 +77,13 @@
     return klass;
   };
 
-
+  // @description 返回需要的函数
+  method.getNeedFn = function (key, scope) {
+    scope = scope || window;
+    if (_.isFunction(key)) return key;
+    if (_.isFunction(scope[key])) return scope[key];
+    return function () { };
+  };
 
   /**
   * @description 在fn方法的前后通过键值设置两个传入的回调
@@ -87,15 +93,16 @@
   * @param context {object} 执行环节的上下文
   * @return {function}
   */
-  method.wrapmethod = function(fn, beforeFnKey, afterFnKey, context) {
+  method.wrapmethod = function (fn, beforeFnKey, afterFnKey, context) {
 
     var scope = context || this;
     var action = _.wrap(fn, function (func) {
-      _.bind(scope[beforeFnKey], scope);
+
+      _.bind(_.getNeedFn(beforeFnKey, scope), scope);
 
       func.call(scope);
 
-      _.bind(scope[afterFnKey], scope);
+      _.bind(_.getNeedFn(afterFnKey, scope), scope);
     });
 
     _.bind(action, scope);

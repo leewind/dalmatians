@@ -13,40 +13,41 @@
   <script type="text/javascript" src="underscore-min.js"></script>
   <script type="text/javascript" src="zepto.min.js"></script>
 
+
   <script src="../src/Dalmatians.underscore.extend.js" type="text/javascript"></script>
 
-
+  <script src="../src/Dalmatians01.js" type="text/javascript"></script>
   <!--<script type="text/javascript" src="example.js"></script>-->
-  <script type="text/javascript" src="../src/Dalmatians.js"></script>
-  <script type="text/javascript">
-    window.onload = function() {
-      var ExampleView = Dalmatian.inherit(Dalmatian.View, {
-        templateSet : {
-          0: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="cancelBtn">取消</button></div>',
-          1: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="confirmBtn">确定</button></div>',
-          2: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="failedBtn" disabled>失败</button></div>'
-        },
 
-        statusSet: {
-          STATUS_CANCEL: 0,
-          STATUS_SUCCESS: 1,
-          STATUS_FAIL: 2
+  <script type="text/javascript">
+    window.onload = function () {
+      var ExampleView = _.inherit(Dalmatian.View, {
+        __property__: function ($super) {
+          $super();
+          this.templateSet = {
+            0: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="cancelBtn">取消</button></div>',
+            1: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="confirmBtn">确定</button></div>',
+            2: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="failedBtn" disabled>失败</button></div>'
+          };
+
+          this.statusSet = {
+            STATUS_CANCEL: 0,
+            STATUS_SUCCESS: 1,
+            STATUS_FAIL: 2
+          };
         }
+
       });
 
       var exampleView = new ExampleView();
 
-      var ExampleAdapter = Dalmatian.inherit(Dalmatian.Adapter, {
-        parse : function(origindata) {
-          return {list: origindata.cities};
+      var ExampleAdapter = _.inherit(Dalmatian.Adapter, {
+        parse: function (origindata) {
+          return { list: origindata.cities };
         }
       });
 
       var exampleAdapter = new ExampleAdapter();
-
-      var ExampleViewController = Dalmatian.inherit(Dalmatian.ViewController,{
-        name: 'xxx'
-      });
 
       var origindata = {
         cities: [
@@ -59,7 +60,7 @@
         view: exampleView,
         adapter: exampleAdapter,
         container: 'body',
-        onViewBeforeCreate: function(){
+        onViewBeforeCreate: function () {
           this.origindata = origindata
           this.viewstatus = this.view.statusSet.STATUS_CANCEL
         }
@@ -67,7 +68,7 @@
 
       exampleViewController.show()
 
-      setTimeout(function() {
+      setTimeout(function () {
         console.log('hide')
         exampleViewController.hide();
       }, 10000);

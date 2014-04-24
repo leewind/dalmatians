@@ -209,7 +209,7 @@ Dalmatian.template = _.template;
       });
     }
   });
-
+  
   Dalmatian.ViewController = _.inherit({
     // @description 构造函数入口
     initialize: function (options) {
