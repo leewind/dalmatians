@@ -207,7 +207,7 @@ Dalmatian.template = _.template;
       // @description 通知所有注册的观察者被观察者的数据发生变化
       _.each(this.observers, function (viewcontroller) {
         if (_.isObject(viewcontroller))
-          _.callmethod(viewcontroller.update, viewcontroller);
+          _.bind(viewcontroller.update, viewcontroller);
       });
     }
   });
