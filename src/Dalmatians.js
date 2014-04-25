@@ -1,3 +1,5 @@
+"use strict";
+
 // @notation 本框架默认是以来于zepto。这里构建了基础的方法层,当用户使用其他框架时，可能需要复写这几个基础方法
 
 // @description 解析event参数的正则
@@ -78,6 +80,10 @@ function domImplement($element, action, context, param) {
     $element[action].apply(context || $element, param);
 }
 
+function createDom (html) {
+  return $(html);
+}
+
 // --------------------------------------------------- //
 // ------------------华丽的分割线--------------------- //
 
@@ -93,6 +99,7 @@ Dalmatian.View = _.inherit({
     this.handleOptions(options);
 
   },
+
   // @description 设置默认属性
   _initialize: function() {
 
@@ -112,12 +119,14 @@ Dalmatian.View = _.inherit({
     this.viewid = _.uniqueId('dalmatian-view-');
 
   },
+
   // @description 操作构造函数传入操作
   handleOptions: function(options) {
     // @description 从形参中获取key和value绑定在this上
     if (_.isObject(options)) _.extend(this, options);
 
   },
+
   // @description 通过模板和数据渲染具体的View
   // @param status {enum} View的状态参数
   // @param data {object} 匹配View的数据格式的具体数据
@@ -155,6 +164,7 @@ Dalmatian.View = _.inherit({
       }
     }
   },
+
   // @override
   // @description 可以被复写，当status和data分别发生变化时候
   // @param status {enum} view的状态值
@@ -173,64 +183,75 @@ Dalmatian.View = _.inherit({
 });
 
 Dalmatian.Adapter = _.inherit({
+
   // @description 构造函数入口
   initialize: function(options) {
     this._initialize();
     this.handleOptions(options);
 
   },
+
   // @description 设置默认属性
   _initialize: function() {
     this.observers = [];
     this.viewmodel = null;
     this.datamodel = null;
   },
+
   // @description 操作构造函数传入操作
   handleOptions: function(options) {
     // @description 从形参中获取key和value绑定在this上
     if (_.isObject(options)) _.extend(this, options);
   },
+
   // @description 设置
   format: function(origindata){
     this.datamodel = origindata;
-    return this.viewmodel = this.parse(origindata);
+    this.viewmodel = this.parse(origindata);
+    return this.viewmodel;
   },
+
   // @override
   // @description parse方法用来将datamodel转化为viewmodel，必须被重写
   parse: function(origindata) {
     throw Error('方法必须被重写');
   },
+
   registerObserver: function(viewcontroller) {
     // @description 检查队列中如果没有viewcontroller，从队列尾部推入
     if (!_.contains(this.observers, viewcontroller)) {
       this.observers.push(viewcontroller);
     }
   },
+
   unregisterObserver: function(viewcontroller) {
     // @description 从observers的队列中剔除viewcontroller
     this.observers = _.without(this.observers, viewcontroller);
   },
+
   notifyDataChanged: function() {
     // @description 通知所有注册的观察者被观察者的数据发生变化
     _.each(this.observers, function(viewcontroller) {
       if (_.isObject(viewcontroller))
-        _.callmethod(viewcontroller.update, viewcontroller, [this.format(this.datamodel)])
+        _.callmethod(viewcontroller.update, viewcontroller, [this.format(this.datamodel)]);
     });
   }
 });
 
 Dalmatian.ViewController = _.inherit({
+
   // @description 构造函数入口
   initialize: function(options) {
     this._initialize();
     this.handleOptions(options);
     this.create();
-    this.bind();
   },
+
   // @description 设置默认属性
   _initialize: function() {
     this.origindata = {};
   },
+
   // @description 操作构造函数传入操作
   handleOptions: function(options) {
     this._verify(options);
@@ -238,10 +259,12 @@ Dalmatian.ViewController = _.inherit({
     // @description 从形参中获取key和value绑定在this上
     if (_.isObject(options)) _.extend(this, options);
   },
+
   // @description 验证参数
   _verify: function(options) {
     if (!_.property('view')(options)) throw Error('view必须在实例化的时候传入ViewController');
   },
+
   // @description 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话，直接调用render方法重绘
   update: function(data){
     if(!_.callmethod(this.onViewUpdate, this)){
@@ -278,17 +301,39 @@ Dalmatian.ViewController = _.inherit({
     }
     return eventArr;
   },
+
   _create: function() {
     var data = this.adapter.format(this.origindata);
     this.view.render(this.viewstatus, data);
   },
+
   create: function() {
+
+    var $element = selectDom(this.view.viewid);
+    if (domImplement($element, 'get', false, [0] )) {
+      return _.callmethod(this.recreate, this);
+    }
+
     // @notation 在create方法调用前后设置onViewBeforeCreate和onViewAfterCreate两个回调
     _.wrapmethod(this._create, 'onViewBeforeCreate', 'onViewAfterCreate', this);
 
   },
+
+  /**
+   * @description 如果进入create判断是否需要update一下页面，sync view和viewcontroller的数据
+   */
+  _recreate: function(){
+    var data = this.adapter.viewmodel;
+    if (data)
+      this.view.update(this.viewstatus, data);
+  },
+
+  recreate: function(){
+    _.wrapmethod(this._recreate, 'onViewBeforeRecreate', 'onViewAfterRecreate', this);
+  },
+
   _bind: function() {
-    this.viewcontent = this.view.html;
+    this.viewcontent = createDom(this.view.html);
 
     var eventsList = this.parseEvents(this.events);
 
@@ -297,9 +342,11 @@ Dalmatian.ViewController = _.inherit({
       eventmethod(item.target, 'on', item.event, item.callback, scope);
     });
   },
+
   bind: function() {
     _.wrapmethod(this._bind, 'onViewBeforeBind', 'onViewAfterBind', this);
   },
+
   _show: function() {
     var $element = selectDom('#' + this.view.viewid);
 
@@ -310,27 +357,38 @@ Dalmatian.ViewController = _.inherit({
 
     domImplement($element, 'show');
   },
+
   show: function() {
+    this.bind();
+
     _.wrapmethod(this._show, 'onViewBeforeShow', 'onViewAfterShow', this);
   },
+
   _hide: function() {
     var $element = selectDom('#' + this.view.viewid);
     domImplement($element, 'hide');
   },
+
   hide: function() {
     _.wrapmethod(this._hide, 'onViewBeforeHide', 'onViewAfterHide', this);
+
+    this.forze();
   },
+
   _forze: function() {
     var $element = selectDom('#' + this.view.viewid);
     domImplement($element, 'off');
   },
+
   forze: function() {
     _.wrapmethod(this._forze, 'onViewBeforeForzen', 'onViewAfterForzen', this).call(this);
   },
+
   _destory: function() {
     var $element = selectDom('#' + this.view.viewid).remove();
     domImplement($element, 'remove');
   },
+
   destory: function() {
     _.wrapmethod(this._destory, 'onViewBeforeDestory', 'onViewAfterDestory', this).call(this);
   }
