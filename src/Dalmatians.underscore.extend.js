@@ -85,11 +85,15 @@
     return function () { };
   };
 
-  // @notation 不需要使用_.bind代替
-  // method.callmethod = function (method, scope, params) {
-  //   scope = scope || this;
-  //   if (_.isFunction(method)) method.apply(scope, params);
-  // };
+  method.callmethod = function (method, scope, params) {
+    scope = scope || this;
+    if (_.isFunction(method)) {
+      method.apply(scope, params);
+      return true;
+    }
+
+    return false;
+  };
 
   /**
   * @description 在fn方法的前后通过键值设置两个传入的回调
