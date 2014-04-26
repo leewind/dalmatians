@@ -280,6 +280,8 @@ Dalmatian.ViewController = _.inherit({
    */
   parseEvents: function(events) {
 
+    console.log(events)
+
     //用于返回的事件对象
     var eventArr = {};
     //注意，此处做简单的字符串数据解析即可，不做实际业务
@@ -299,6 +301,9 @@ Dalmatian.ViewController = _.inherit({
         method: method
       });
     }
+
+    console.log(eventArr)
+
     return eventArr;
   },
 

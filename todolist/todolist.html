@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ToDoList</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="http://cdn.bootcss.com/twitter-bootstrap/2.2.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="http://www.bootcss.com/p/flat-ui/css/flat-ui.css">
+</head>
+<body>
+  <article class="container">
+  </article>
+
+  <script type="text/underscore-template" id="template-todolist">
+    <section class="row">
+      <div class="span4">
+        <form action="">
+          <legend>To Do List -- Input</legend>
+          <input type="text" placeholder="ToDoList" id="todoinput">
+        </form>
+      </div>
+      <div class="span4">
+        <h5>To Do List</h5>
+        <ul id="todolist">
+        <%_.each(list, function(item){%>
+          <li><%=item.content %></li>
+        <%})%>
+        </ul>
+      </div>
+    </section>
+  </script>
+
+  <script type="text/javascript" src="../example/underscore-min.js"></script>
+  <script type="text/javascript" src="../example/zepto.min.js"></script>
+  <script src="../src/Dalmatians.underscore.extend.js" type="text/javascript"></script>
+  <script src="../src/Dalmatians.js" type="text/javascript"></script>
+  <script type="text/javascript" src="demo.js"></script>
+</body>
+</html>
