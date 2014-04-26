@@ -241,19 +241,19 @@ Dalmatian.Adapter = _.inherit({
 Dalmatian.ViewController = _.inherit({
 
   // @description 构造函数入口
-  initialize: function(options) {
+  initialize: function (options) {
     this._initialize();
     this.handleOptions(options);
     this.create();
   },
 
   // @description 设置默认属性
-  _initialize: function() {
+  _initialize: function () {
     this.origindata = {};
   },
 
   // @description 操作构造函数传入操作
-  handleOptions: function(options) {
+  handleOptions: function (options) {
     this._verify(options);
 
     // @description 从形参中获取key和value绑定在this上
@@ -261,24 +261,24 @@ Dalmatian.ViewController = _.inherit({
   },
 
   // @description 验证参数
-  _verify: function(options) {
+  _verify: function (options) {
     if (!_.property('view')(options)) throw Error('view必须在实例化的时候传入ViewController');
   },
 
   // @description 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话，直接调用render方法重绘
-  update: function(data){
-    if(!_.callmethod(this.onViewUpdate, this)){
+  update: function (data) {
+    if (!_.callmethod(this.onViewUpdate, this)) {
       this.view.render(this.viewstatus, data);
     }
   },
 
   /**
-   * @description 传入事件对象，解析之，解析event，返回对象{events: [{target: '#btn', event:'click', callback: handler}]}
-   * @param events {obj} 事件对象，默认传入唯一id
-   * @param namespace 事件命名空间
-   * @return {obj}
-   */
-  parseEvents: function(events) {
+  * @description 传入事件对象，解析之，解析event，返回对象{events: [{target: '#btn', event:'click', callback: handler}]}
+  * @param events {obj} 事件对象，默认传入唯一id
+  * @param namespace 事件命名空间
+  * @return {obj}
+  */
+  parseEvents: function (events) {
 
     console.log(events)
 
@@ -307,15 +307,15 @@ Dalmatian.ViewController = _.inherit({
     return eventArr;
   },
 
-  _create: function() {
+  _create: function () {
     var data = this.adapter.format(this.origindata);
     this.view.render(this.viewstatus, data);
   },
 
-  create: function() {
+  create: function () {
 
     var $element = selectDom(this.view.viewid);
-    if (domImplement($element, 'get', false, [0] )) {
+    if (domImplement($element, 'get', false, [0])) {
       return _.callmethod(this.recreate, this);
     }
 
@@ -325,34 +325,43 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
-   * @description 如果进入create判断是否需要update一下页面，sync view和viewcontroller的数据
-   */
-  _recreate: function(){
+  * @description 如果进入create判断是否需要update一下页面，sync view和viewcontroller的数据
+  */
+  _recreate: function () {
     var data = this.adapter.viewmodel;
     if (data)
       this.view.update(this.viewstatus, data);
   },
 
-  recreate: function(){
+  recreate: function () {
     _.wrapmethod(this._recreate, 'onViewBeforeRecreate', 'onViewAfterRecreate', this);
   },
 
-  _bind: function() {
+  _bind: function () {
     this.viewcontent = createDom(this.view.html);
 
     var eventsList = this.parseEvents(this.events);
 
     var scope = this;
-    _.each(eventsList, function(item) {
-      eventmethod(item.target, 'on', item.event, item.callback, scope);
+    _.each(eventsList, function (item) {
+
+      //l_wang eventmethod有点问题，这里暂时这样做
+      //      eventmethod(item.target, 'on', item.event, item.callback, scope);
+
+      if (item.target === '') {
+        scope.viewcontent.on(item.event, item.callback);
+      } else {
+        scope.viewcontent.on(item.event, item.target, item.callback);
+      }
+
     });
   },
 
-  bind: function() {
+  bind: function () {
     _.wrapmethod(this._bind, 'onViewBeforeBind', 'onViewAfterBind', this);
   },
 
-  _show: function() {
+  _show: function () {
     var $element = selectDom('#' + this.view.viewid);
 
     if ((!$element || $element.length === 0) && this.viewcontent) {
@@ -363,38 +372,38 @@ Dalmatian.ViewController = _.inherit({
     domImplement($element, 'show');
   },
 
-  show: function() {
+  show: function () {
     this.bind();
 
     _.wrapmethod(this._show, 'onViewBeforeShow', 'onViewAfterShow', this);
   },
 
-  _hide: function() {
+  _hide: function () {
     var $element = selectDom('#' + this.view.viewid);
     domImplement($element, 'hide');
   },
 
-  hide: function() {
+  hide: function () {
     _.wrapmethod(this._hide, 'onViewBeforeHide', 'onViewAfterHide', this);
 
     this.forze();
   },
 
-  _forze: function() {
+  _forze: function () {
     var $element = selectDom('#' + this.view.viewid);
     domImplement($element, 'off');
   },
 
-  forze: function() {
+  forze: function () {
     _.wrapmethod(this._forze, 'onViewBeforeForzen', 'onViewAfterForzen', this).call(this);
   },
 
-  _destory: function() {
+  _destory: function () {
     var $element = selectDom('#' + this.view.viewid).remove();
     domImplement($element, 'remove');
   },
 
-  destory: function() {
+  destory: function () {
     _.wrapmethod(this._destory, 'onViewBeforeDestory', 'onViewAfterDestory', this).call(this);
   }
 });
