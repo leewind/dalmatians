@@ -115,7 +115,7 @@ Dalmatian.View = _.inherit({
     var DEFAULT_CONTAINER_TEMPLATE = '<section class="view" id="<%=viewid%>"><%=html%></section>';
 
     // @description view状态机
-    this.statusSet = {};
+    // this.statusSet = {};
 
     this.defaultContainerTemplate = DEFAULT_CONTAINER_TEMPLATE;
 
@@ -123,7 +123,7 @@ Dalmatian.View = _.inherit({
     // @description template集合，根据status做template的map
     // @example
     //    { 0: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul>' }
-    this.templateSet = {};
+    // this.templateSet = {};
 
     this.viewid = _.uniqueId('dalmatian-view-');
 

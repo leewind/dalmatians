@@ -1,0 +1,37 @@
+  <!doctype html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>ToDoList</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="http://designmodo.github.io/Flat-UI/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="http://designmodo.github.io/Flat-UI/css/flat-ui.css">
+  </head>
+  <body>
+    <article class="container">
+    </article>
+
+    <input type="text" id="addmsg">
+    <button id="addbtn">add</button>
+
+    <script type="text/underscore-template" id="template-alert">
+      <div class="cui-view cui-layer cui-alert" id="cui-1398690283133" >
+        <div class="cui-pop-box">
+          <div class="cui-bd">
+            <p class="cui-error-tips"><%=content%></p>
+            <div class="cui-roller-btns">
+              <div class="cui-flexbd cui-btns-cancel"><%=cancel%></div>
+              <div class="cui-flexbd cui-btns-sure"><%=confirm%></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </script>
+
+    <script type="text/javascript" src="../example/underscore-min.js"></script>
+    <script type="text/javascript" src="../example/zepto.min.js"></script>
+    <script src="../src/Dalmatians.underscore.extend.js" type="text/javascript"></script>
+    <script src="../src/Dalmatians.js" type="text/javascript"></script>
+    <script type="text/javascript" src="ui.alert.js"></script>
+  </body>
+  </html>
