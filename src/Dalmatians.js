@@ -38,19 +38,31 @@ var eventoperator = function(obj, action, name, rest) {
 // ----------------------------------------------------
 
 // @notation 默认使用zepto的事件委托机制
-function eventmethod(obj, action, name, callback, context) {
-  callback = _.bind(callback, context || this);
+function eventmethod(obj, action, name, callback, context, subobj) {
+  // _.bind(callback, context || this);
 
-  var delegate = function(target, eventName, eventCallback) {
-    target.on(eventName, eventCallback);
+  var delegate = function(target, eventName, eventCallback, subtarget) {
+    if (subtarget) {
+      target.on(eventName, subtarget, eventCallback);
+    }else{
+      target.on(eventName, eventCallback);
+    }
   };
 
-  var undelegate = function(target, eventName, eventCallback) {
-    target.off(eventName, eventCallback);
+  var undelegate = function(target, eventName, eventCallback, subtarget) {
+    if (subtarget) {
+      target.off(eventName, subtarget, eventCallback);
+    }else{
+      target.off(eventName, eventCallback);
+    }
   };
 
-  var trigger = function(target, eventName) {
-    target.trigger(eventName);
+  var trigger = function(target, eventName, subtarget) {
+    if (subtarget) {
+      target.find(subtarget).trigger(eventName);
+    }else{
+      target.trigger(eventName);
+    }
   };
 
   var map = {
@@ -61,11 +73,8 @@ function eventmethod(obj, action, name, callback, context) {
     'trigger': trigger
   };
 
-  // @notation 需要验证，有问题！
-  if (!eventmethod(map, action, name, [callback, context]) || !callback) return this;
-
   if (_.isFunction(map[action])) {
-    map[action](obj || $, name, callback);
+    map[action](obj, name, callback, subobj);
   }
 
 }
@@ -348,13 +357,10 @@ Dalmatian.ViewController = _.inherit({
     var scope = this;
     _.each(eventsList, function (item) {
 
-      //l_wang eventmethod有点问题，这里暂时这样做
-      //      eventmethod(item.target, 'on', item.event, item.callback, scope);
-
       if (item.target === '') {
-        scope.viewcontent.on(item.event, item.callback);
+        eventmethod(scope.viewcontent, 'on', item.event, item.callback, scope);
       } else {
-        scope.viewcontent.on(item.event, item.target, item.callback);
+        eventmethod(scope.viewcontent, 'on', item.event, item.callback, scope, item.target);
       }
 
     });
