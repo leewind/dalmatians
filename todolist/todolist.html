@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <title>ToDoList</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="http://cdn.bootcss.com/twitter-bootstrap/2.2.2/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="http://www.bootcss.com/p/flat-ui/css/flat-ui.css">
+  <link rel="stylesheet" type="text/css" href="http://designmodo.github.io/Flat-UI/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="http://designmodo.github.io/Flat-UI/css/flat-ui.css">
 </head>
 <body>
   <article class="container">
@@ -13,14 +13,12 @@
 
   <script type="text/underscore-template" id="template-todolist">
     <section class="row">
-      <div class="span4">
+      <div class="col-xs-9">
         <form action="">
           <legend>To Do List -- Input</legend>
-          <input type="text" placeholder="ToDoList" id="todoinput">
+          <input type="text" placeholer="ToDoList" id="todoinput">
+          <button class="btn btn-primary" data-action="add">添加</button>
         </form>
-      </div>
-      <div class="span4">
-        <h5>To Do List</h5>
         <ul id="todolist">
         <%_.each(list, function(item){%>
           <li><%=item.content %></li>

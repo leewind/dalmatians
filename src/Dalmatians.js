@@ -194,8 +194,8 @@ Dalmatian.Adapter = _.inherit({
   // @description 设置默认属性
   _initialize: function() {
     this.observers = [];
-    this.viewmodel = null;
-    this.datamodel = null;
+    this.viewmodel = {};
+    this.datamodel = {};
   },
 
   // @description 操作构造函数传入操作
@@ -231,9 +231,10 @@ Dalmatian.Adapter = _.inherit({
 
   notifyDataChanged: function() {
     // @description 通知所有注册的观察者被观察者的数据发生变化
+    var data = this.format(this.datamodel);
     _.each(this.observers, function(viewcontroller) {
       if (_.isObject(viewcontroller))
-        _.callmethod(viewcontroller.update, viewcontroller, [this.format(this.datamodel)]);
+        _.callmethod(viewcontroller.update, viewcontroller, [data]);
     });
   }
 });
@@ -242,14 +243,8 @@ Dalmatian.ViewController = _.inherit({
 
   // @description 构造函数入口
   initialize: function (options) {
-    this._initialize();
     this.handleOptions(options);
     this.create();
-  },
-
-  // @description 设置默认属性
-  _initialize: function () {
-    this.origindata = {};
   },
 
   // @description 操作构造函数传入操作
@@ -267,9 +262,14 @@ Dalmatian.ViewController = _.inherit({
 
   // @description 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话，直接调用render方法重绘
   update: function (data) {
-    if (!_.callmethod(this.onViewUpdate, this)) {
-      this.view.render(this.viewstatus, data);
+
+    _.callmethod(this.hide, this);
+
+    if (!_.callmethod(this.onViewUpdate, this, [data])) {
+      this.render();
     }
+
+    _.callmethod(this.show, this);
   },
 
   /**
@@ -279,8 +279,6 @@ Dalmatian.ViewController = _.inherit({
   * @return {obj}
   */
   parseEvents: function (events) {
-
-    console.log(events)
 
     //用于返回的事件对象
     var eventArr = [];
@@ -302,14 +300,21 @@ Dalmatian.ViewController = _.inherit({
       });
     }
 
-    console.log(eventArr)
-
     return eventArr;
   },
 
+  /**
+   * @override
+   *
+   */
+  render: function() {
+    // @notation  这个方法需要被复写
+    // var data = this.adapter.format(this.origindata);
+    // this.view.render(this.viewstatus, data);
+  },
+
   _create: function () {
-    var data = this.adapter.format(this.origindata);
-    this.view.render(this.viewstatus, data);
+    this.render();
   },
 
   create: function () {
@@ -328,9 +333,7 @@ Dalmatian.ViewController = _.inherit({
   * @description 如果进入create判断是否需要update一下页面，sync view和viewcontroller的数据
   */
   _recreate: function () {
-    var data = this.adapter.viewmodel;
-    if (data)
-      this.view.update(this.viewstatus, data);
+    this.update();
   },
 
   recreate: function () {
@@ -364,10 +367,11 @@ Dalmatian.ViewController = _.inherit({
   _show: function () {
     var $element = selectDom('#' + this.view.viewid);
 
-    if ((!$element || $element.length === 0) && this.viewcontent) {
+    // @notation 需要剔除码？
+    // if ((!$element || $element.length === 0) && this.viewcontent) {
       var $container = selectDom(this.container);
       domImplement($container, 'html', false, [this.viewcontent]);
-    }
+    // }
 
     domImplement($element, 'show');
   },
@@ -395,7 +399,7 @@ Dalmatian.ViewController = _.inherit({
   },
 
   forze: function () {
-    _.wrapmethod(this._forze, 'onViewBeforeForzen', 'onViewAfterForzen', this).call(this);
+    _.wrapmethod(this._forze, 'onViewBeforeForzen', 'onViewAfterForzen', this);
   },
 
   _destory: function () {
@@ -404,6 +408,6 @@ Dalmatian.ViewController = _.inherit({
   },
 
   destory: function () {
-    _.wrapmethod(this._destory, 'onViewBeforeDestory', 'onViewAfterDestory', this).call(this);
+    _.wrapmethod(this._destory, 'onViewBeforeDestory', 'onViewAfterDestory', this);
   }
 });

@@ -20,32 +20,46 @@ var Adapter = _.inherit(Dalmatian.Adapter, {
 });
 
 var adapter = new Adapter();
+adapter.format(origindata);
 
 var Controller = _.inherit(Dalmatian.ViewController, {
+
+  render: function() {
+    console.log('controller-render')
+    var data = adapter.viewmodel;
+    this.view.render(this.viewstatus, data);
+  },
+
   events: {
-    'change #todoinput': 'showLog',
-    'click #todoinput': 'showInput'
+    'click button': 'action'
   },
 
-  showLog: function(e) {
-    var msg = $(e.currentTarget).val();
-    console.log(msg);
-  },
+  action: function(e) {
+    e.preventDefault();
 
-  showInput: function(e) {
-    console.log('show input');
+    var target = $(e.currentTarget).attr('data-action');
+    var strategy = {
+      'add': function(e) {
+        var value = $('#todoinput').val();
+        adapter.datamodel.list.push({content: value});
+        // this.adapter.parse(this.adapter.datamodel);
+        adapter.notifyDataChanged();
+      }
+    }
+
+    strategy[target].apply(this, [e]);
   }
 })
 
 var controller = new Controller({
   view: view,
-  adapter: adapter,
   container: '.container',
   onViewBeforeCreate: function () {
-    this.origindata = origindata;
     this.viewstatus = this.view.statusSet.STATUS_INIT
   }
 });
+
+adapter.registerObserver(controller);
 
 controller.show();
 
