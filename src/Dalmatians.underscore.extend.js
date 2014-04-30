@@ -67,7 +67,7 @@
       }
 
       //此处对对象进行扩展，当前原型链已经存在该对象，便进行扩展
-      if (_.isObject(klass.prototype[k]) && _.isObject(value)) {
+      if (_.isObject(klass.prototype[k]) && _.isObject(value) && (typeof klass.prototype[k] != 'function' && typeof value != 'fuction')) {
         //原型链是共享的，这里不好办
         var temp = {};
         _.extend(temp, klass.prototype[k]);
