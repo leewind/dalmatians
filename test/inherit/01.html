@@ -1,0 +1,53 @@
+  <!doctype html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>ToDoList</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="http://designmodo.github.io/Flat-UI/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="http://designmodo.github.io/Flat-UI/css/flat-ui.css">
+  </head>
+  <body>
+
+    <script src="../../example/underscore-min.js" type="text/javascript"></script>
+    <script src="../../src/Dalmatians.underscore.extend.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+      var Father = _.inherit({
+        aFn: function () {
+
+        },
+        events: {
+          obj01: 1
+        }
+      });
+
+      var Child = _.inherit(Father, {
+        bFn: function () {
+
+        },
+        events: {
+          obj02: 2
+        }
+
+      });
+
+      var Child1 = _.inherit(Child, {
+        cFn: function () {
+
+        },
+        events: {
+          obj03: 3
+        }
+
+      });
+
+      var a = new Father();
+      var b = new Child();
+      var c = new Child1();
+
+      var s = '';
+
+    </script>
+  </body>
+  </html>

@@ -66,7 +66,17 @@
         }
       }
 
-      klass.prototype[k] = value;
+      //此处对对象进行扩展，当前原型链已经存在该对象，便进行扩展
+      if (_.isObject(klass.prototype[k]) && _.isObject(value)) {
+        //原型链是共享的，这里不好办
+        var temp = {};
+        _.extend(temp, klass.prototype[k]);
+        _.extend(temp, value);
+        klass.prototype[k] = temp;
+      } else {
+        klass.prototype[k] = value;
+      }
+
     }
 
     if (!klass.prototype.initialize)
