@@ -19,6 +19,9 @@
         },
         events: {
           obj01: 1
+        },
+        obj1: {
+          a: 1
         }
       });
 
@@ -28,8 +31,10 @@
         },
         events: {
           obj02: 2
+        },
+         obj2: {
+          a: 2
         }
-
       });
 
       var Child1 = _.inherit(Child, {
@@ -38,13 +43,29 @@
         },
         events: {
           obj03: 3
+        },
+        obj3: {
+          a: 3
         }
-
       });
+
+      var C2 = _.inherit(Child1, {
+        dFn: function () {
+
+        },
+        events: {
+          obj04: 4
+        },
+        obj1: {
+          b: 2
+        }
+      });
+
 
       var a = new Father();
       var b = new Child();
       var c = new Child1();
+      var d = new C2();
 
       var s = '';
 
