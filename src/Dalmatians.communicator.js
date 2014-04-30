@@ -49,29 +49,29 @@ Dalmatian.AjaxCommunicator = _.inherit(Dalmatian.AbstractCommunicator, {
       error: options.error || emptyfn,
       beforeSend: options.beforeSend || emptyfn,
       complete: options.complete || emptyfn
-    }
+    };
   },
 
   create: function(options) {
-    options = options || {}
+    options = options || {};
     options.type = 'POST';
     $.ajax(this._setOptions(options));
   },
 
   update: function(options) {
-    options = options || {}
+    options = options || {};
     options.type = 'PUT';
     $.ajax(this._setOptions(options));
   },
 
   read: function(options) {
-    options = options || {}
+    options = options || {};
     options.type = 'GET';
     $.ajax(this._setOptions(options));
   },
 
   remove: function(options) {
-    options = options || {}
+    options = options || {};
     options.type = 'DELETE';
     $.ajax(this._setOptions(options));
   }
