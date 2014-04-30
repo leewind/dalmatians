@@ -30,6 +30,18 @@ var Controller = _.inherit(Dalmatian.ViewController, {
     this.adapter.datamodel.content = options.content;
     this.adapter.notifyDataChanged();
   },
+
+  events: {
+    "click .cui-btns-cancel": "cancelaction"
+  },
+
+  cancelaction: function() {
+    this.onCancelBtnClick();
+  },
+
+  attr: function(key, value){
+    this[key] = value;
+  }
 });
 
 var controller = new Controller({
@@ -38,7 +50,7 @@ var controller = new Controller({
   container: '.container',
   onViewBeforeCreate: function() {
 
-var origindata = {
+  var origindata = {
       content: 'fuck',
       confirm: 'confirmbtn',
       cancel: 'cancelbtn'
@@ -48,18 +60,20 @@ var origindata = {
 
     this.adapter.registerObserver(this);
     this.viewstatus = this.view.statusSet.STATUS_INIT;
+  },
+  onCancelBtnClick: function() {
+    alert('cancel 2')
   }
 });
 
-
-
 controller.show();
-
-
 
 $('#addbtn').on('click', function(e) {
   var content = $('#addmsg').val();
   // adapter.datamodel.content = content;
   // adapter.notifyDataChanged();
   controller.set({content: content})
+  controller.attr('onCancelBtnClick', function(){
+    alert('asdfsafda')
+  })
 })
