@@ -113,7 +113,7 @@
   * @param context {object} 执行环节的上下文
   * @return {function}
   */
-  method.wrapmethod = function (fn, beforeFnKey, afterFnKey, context) {
+  method.wrapmethod = method.insert = function (fn, beforeFnKey, afterFnKey, context) {
 
     var scope = context || this;
     var action = _.wrap(fn, function (func) {
