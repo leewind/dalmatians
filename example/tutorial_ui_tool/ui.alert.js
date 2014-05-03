@@ -1,33 +1,53 @@
-var htmltemplate = $('#template-alert').html();
+﻿var htmltemplate = $('#template-alert').html();
 
 var AlertView = _.inherit(Dalmatian.View, {
   templateSet: {
-    0: htmltemplate,
+    0: htmltemplate
   },
-
+  
   statusSet: {
     STATUS_INIT: 0
   }
 });
 
-var view = new AlertView()
 
 var Adapter = _.inherit(Dalmatian.Adapter, {
-      parse: function(data) {
-        return data;
-      }
-    });
-
-    var adapter = new Adapter();
+  parse: function (data) {
+    return data;
+  }
+});
 
 var Controller = _.inherit(Dalmatian.ViewController, {
-  render: function() {
+  //设置默认信息
+  _initialize: function () {
+    this.origindata = {
+      content: '',
+      confirm: '确定',
+      cancel: '取消'
+    }
+  },
+
+  initialize: function ($super, opts) {
+    this._initialize();
+    $super(opts);
+    this._init();
+  },
+
+  //基础数据处理
+  _init: function () {
+    this.adapter.format(this.origindata);
+    this.adapter.registerObserver(this);
+    this.viewstatus = this.view.statusSet.STATUS_INIT;
+  },
+
+  render: function () {
     var data = this.adapter.viewmodel;
     this.view.render(this.viewstatus, data);
   },
 
-  set: function(options) {
-    this.adapter.datamodel.content = options.content;
+  set: function (options) {
+    _.extend(this.adapter.datamodel, options);
+//    this.adapter.datamodel.content = options.content;
     this.adapter.notifyDataChanged();
   },
 
@@ -35,45 +55,27 @@ var Controller = _.inherit(Dalmatian.ViewController, {
     "click .cui-btns-cancel": "cancelaction"
   },
 
-  cancelaction: function() {
+  cancelaction: function () {
     this.onCancelBtnClick();
-  },
-
-  attr: function(key, value){
-    this[key] = value;
   }
 });
+
+var view = new AlertView()
+var adapter = new Adapter();
 
 var controller = new Controller({
   view: view,
   adapter: adapter,
   container: '.container',
-  onViewBeforeCreate: function() {
-
-  var origindata = {
-      content: 'fuck',
-      confirm: 'confirmbtn',
-      cancel: 'cancelbtn'
-    }
-
-    this.adapter.format(origindata);
-
-    this.adapter.registerObserver(this);
-    this.viewstatus = this.view.statusSet.STATUS_INIT;
-  },
-  onCancelBtnClick: function() {
+  onCancelBtnClick: function () {
     alert('cancel 2')
   }
 });
 
-controller.show();
-
-$('#addbtn').on('click', function(e) {
+$('#addbtn').on('click', function (e) {
   var content = $('#addmsg').val();
   // adapter.datamodel.content = content;
   // adapter.notifyDataChanged();
-  controller.set({content: content})
-  controller.attr('onCancelBtnClick', function(){
-    alert('asdfsafda')
-  })
-})
+  controller.set({ content: content, confirm: '确定1' });
+  controller.show();
+});

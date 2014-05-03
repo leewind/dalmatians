@@ -103,14 +103,14 @@ var Dalmatian = Dalmatian || {};
 Dalmatian.template = _.template;
 Dalmatian.View = _.inherit({
   // @description 构造函数入口
-  initialize: function(options) {
+  initialize: function (options) {
     this._initialize();
     this.handleOptions(options);
 
   },
 
   // @description 设置默认属性
-  _initialize: function() {
+  _initialize: function () {
 
     var DEFAULT_CONTAINER_TEMPLATE = '<section class="view" id="<%=viewid%>"><%=html%></section>';
 
@@ -130,7 +130,7 @@ Dalmatian.View = _.inherit({
   },
 
   // @description 操作构造函数传入操作
-  handleOptions: function(options) {
+  handleOptions: function (options) {
     // @description 从形参中获取key和value绑定在this上
     if (_.isObject(options)) _.extend(this, options);
 
@@ -140,37 +140,28 @@ Dalmatian.View = _.inherit({
   // @param status {enum} View的状态参数
   // @param data {object} 匹配View的数据格式的具体数据
   // @param callback {functiion} 执行完成之后的回调
-  render: function(status, data, callback) {
+  render: function (status, data, callback) {
 
     var templateSelected = this.templateSet[status];
     if (templateSelected) {
 
-      try {
-        // @description 渲染view
-        var templateFn = Dalmatian.template(templateSelected);
-        this.html = templateFn(data);
+      // @description 渲染view
+      var templateFn = Dalmatian.template(templateSelected);
+      this.html = templateFn(data);
 
-        // @description 在view外层加入外壳
-        templateFn = Dalmatian.template(this.defaultContainerTemplate);
-        this.html = templateFn({
-          viewid: this.viewid,
-          html: this.html
-        });
+      // @description 在view外层加入外壳
+      templateFn = Dalmatian.template(this.defaultContainerTemplate);
+      this.html = templateFn({
+        viewid: this.viewid,
+        html: this.html
+      });
 
-        this.currentStatus = status;
+      this.currentStatus = status;
 
-        _.callmethod(callback, this);
+      _.callmethod(callback, this);
 
-        return true;
+      return true;
 
-      } catch (e) {
-
-        throw e;
-
-      } finally {
-
-        return false;
-      }
     }
   },
 
@@ -178,7 +169,7 @@ Dalmatian.View = _.inherit({
   // @description 可以被复写，当status和data分别发生变化时候
   // @param status {enum} view的状态值
   // @param data {object} viewmodel的数据
-  update: function(status, data) {
+  update: function (status, data) {
 
     if (!this.currentStatus || this.currentStatus !== status) {
       return this.render(status, data);
@@ -258,6 +249,8 @@ Dalmatian.ViewController = _.inherit({
 
   // @description 操作构造函数传入操作
   handleOptions: function (options) {
+    if (!options) return;
+
     this._verify(options);
 
     // @description 从形参中获取key和value绑定在this上
@@ -266,7 +259,7 @@ Dalmatian.ViewController = _.inherit({
 
   // @description 验证参数
   _verify: function (options) {
-    if (!_.property('view')(options)) throw Error('view必须在实例化的时候传入ViewController');
+    if (!_.property('view')(options) && (!this.view)) throw Error('view必须在实例化的时候传入ViewController');
   },
 
   // @description 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话，直接调用render方法重绘
@@ -313,10 +306,10 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
-   * @override
-   *
-   */
-  render: function() {
+  * @override
+  *
+  */
+  render: function () {
     // @notation  这个方法需要被复写
     // var data = this.adapter.format(this.origindata);
     // this.view.render(this.viewstatus, data);
@@ -375,8 +368,8 @@ Dalmatian.ViewController = _.inherit({
 
     // @notation 需要剔除码？
     // if ((!$element || $element.length === 0) && this.viewcontent) {
-      var $container = selectDom(this.container);
-      domImplement($container, 'html', false, [this.viewcontent]);
+    var $container = selectDom(this.container);
+    domImplement($container, 'html', false, [this.viewcontent]);
     // }
 
     domImplement($element, 'show');
