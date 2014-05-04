@@ -33,7 +33,8 @@
       <% } %>
       <% for(i = 0; i < days; i++) { %>
         <% day = i + 1; %>
-          <li class="cui_calendar_item" data-date="<%=year%>-<%=month + 1%>-<%=day%>"><%=day %></li>
+        <% if (compaign && compaign.days && compaign.sign && _.contains(compaign.days, day)) { day = compaign.sign } %>
+        <li class="cui_calendar_item" data-date="<%=year%>-<%=month + 1%>-<%=day%>"><%=day %></li>
       <% } %>
     </ul>
   </script>
@@ -103,8 +104,12 @@
       },
 
       render: function () {
+
         //该操作可封装
         var data = this.adapter.viewmodel;
+
+        console.log(data)
+
         this.view.render(this.viewstatus, data);
       },
 
@@ -120,7 +125,8 @@
           year: d.getFullYear(),
           month: d.getMonth(),
           beginWeek: _beginWeek,
-          days: days
+          days: days,
+          compaign: null
         };
       },
 
@@ -140,6 +146,21 @@
     calendar.handleDay(new Date(), function (el, date, calendar) {
       el.html('今天');
     });
+
+    setTimeout(function() {
+
+
+      // @notation 这里就是对datamodel的修改，所有对datamodel的修改都可以被保存下来
+      // 上文里，你直接处理今天，由于没有修改datamodel，所以状态没有被保持下来
+
+      calendar.adapter.datamodel.compaign = {
+        days: [ 7,8,9 ],
+        sign: '低价'
+      };
+
+      calendar.adapter.notifyDataChanged();
+
+    }, 5000);
 
   </script>
 </body>
