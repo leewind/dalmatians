@@ -32,20 +32,14 @@ describe("underscore.extend", function() {
     }
   });
 
-  // describe("#extend()", function() {
-  //   it('should inherit object function', function() {
-  //     // var real = _.inherit(origin, extend);
-  //     var real = _.extend(origin, extend);
-
-  //     assert.equal(expect.spec(), real.spec());
-  //   });
-  // });
-
   describe("#inherit()", function() {
     it('should inherit object function', function() {
-      // var real = _.inherit(origin, extend);
       var expectInstance =  new expect();
-      var realInstance = new real();
+      var realInstance = new extend();
+
+      assert.equal(expectInstance.tag, realInstance.tag);
+      assert.equal(expectInstance.name, realInstance.name);
+      assert.equal(expectInstance.show(), realInstance.show());
       assert.equal(expectInstance.spec(), realInstance.spec());
     });
   });

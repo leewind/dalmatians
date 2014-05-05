@@ -1,7 +1,7 @@
 ﻿(function () {
 
   if (typeof require === 'function' && !_) {
-    _ = require('underscore');
+    var _ = require('underscore');
   };
 
   // @description 全局可能用到的变量
