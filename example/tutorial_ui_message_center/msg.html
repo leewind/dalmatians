@@ -1,0 +1,287 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ToDoList</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="http://designmodo.github.io/Flat-UI/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="http://designmodo.github.io/Flat-UI/css/flat-ui.css">
+  <link href="../style/main.css" rel="stylesheet" type="text/css" />
+  <style type="text/css">
+    .cui-alert { width: auto; position: static; }
+    .txt { border: #cfcfcf 1px solid; margin: 10px 0; width: 80%; }
+    ul, li { padding: 0; margin: 0; }
+    .cui_calendar, .cui_week { list-style: none; }
+    .cui_calendar li, .cui_week li { float: left; width: 14%; overflow: hidden; padding: 4px 0; text-align: center; }
+  </style>
+</head>
+<body>
+  <article class="containerCalendar">
+  </article>
+  <div style="border: 1px solid black; margin: 10px; padding: 10px; clear: both;">
+    华丽的分割</div>
+  <article class="containerAlert">
+  </article>
+  <input type="text" id="addmsg" class="txt">
+  <button id="addbtn" class="btn">
+    show message</button>
+  <script type="text/underscore-template" id="template-alert">
+      <div class=" cui-alert" >
+        <div class="cui-pop-box">
+          <div class="cui-bd">
+            <p class="cui-error-tips"><%=content%></p>
+            <div class="cui-roller-btns">
+              <div class="cui-flexbd cui-btns-cancel"><%=cancel%></div>
+              <div class="cui-flexbd cui-btns-sure"><%=confirm%></div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </script>
+  <script type="text/template" id="template-calendar">
+    <ul class="cui_week">
+      <% var i = 0, day = 0; %>
+      <%for(day = 0; day < 7; day++) { %>
+      <li>
+        <%=weekDayItemTmpt[day] %></li>
+      <%} %>
+    </ul>
+
+    <ul class="cui_calendar">
+      <% for(i = 0; i < beginWeek; i++) { %>
+        <li class="cui_invalid"></li>
+      <% } %>
+      <% for(i = 0; i < days; i++) { %>
+        <% day = i + 1; %>
+        <% if (compaign && compaign.days && compaign.sign && _.contains(compaign.days, day)) { day = compaign.sign } %>
+        <li class="cui_calendar_item" data-date="<%=year%>-<%=month + 1%>-<%=day%>"><%=day %></li>
+      <% } %>
+    </ul>
+  </script>
+  <script type="text/javascript" src="../../vendor/underscore-min.js"></script>
+  <script type="text/javascript" src="../../vendor/zepto.min.js"></script>
+  <script src="../../src/underscore.extend.js" type="text/javascript"></script>
+  <script src="../../src/util.js" type="text/javascript"></script>
+  <script src="../../src/message-center-wl.js" type="text/javascript"></script>
+  <script src="../../src/mvc.js" type="text/javascript"></script>
+  <script type="text/javascript">
+
+    (function () {
+      var htmltemplate = $('#template-alert').html();
+
+      var AlertView = _.inherit(Dalmatian.View, {
+        templateSet: {
+          0: htmltemplate
+        },
+
+        statusSet: {
+          STATUS_INIT: 0
+        }
+      });
+
+
+      var Adapter = _.inherit(Dalmatian.Adapter, {
+        parse: function (data) {
+          return data;
+        }
+      });
+
+      var Controller = _.inherit(Dalmatian.ViewController, {
+        //设置默认信息
+        _initialize: function () {
+          this.origindata = {
+            content: '',
+            confirm: '确定',
+            cancel: '取消'
+          }
+        },
+
+        initialize: function ($super, opts) {
+          this._initialize();
+          $super(opts);
+          this._init();
+        },
+
+        //基础数据处理
+        _init: function () {
+          this.adapter.format(this.origindata);
+          this.adapter.registerObserver(this);
+          this.viewstatus = this.view.statusSet.STATUS_INIT;
+        },
+
+        render: function () {
+          var data = this.adapter.viewmodel;
+          this.view.render(this.viewstatus, data);
+        },
+
+        set: function (options) {
+          _.extend(this.adapter.datamodel, options);
+          //    this.adapter.datamodel.content = options.content;
+          this.adapter.notifyDataChanged();
+
+          //*****************************
+          //淳敏看这样是否合理
+          //*****************************
+          if (options.content) {
+            Dalmatian.MSG.dispatch('ui', 'alertShow', options.content);
+          }
+
+        },
+
+        events: {
+          "click .cui-btns-cancel": "cancelaction"
+        },
+
+        cancelaction: function () {
+          this.onCancelBtnClick();
+        }
+      });
+
+      var view = new AlertView()
+      var adapter = new Adapter();
+
+      var controller = new Controller({
+        view: view,
+        adapter: adapter,
+        container: '.containerAlert',
+        onCancelBtnClick: function () {
+          alert('cancel 2')
+        }
+      });
+
+      $('#addbtn').on('click', function (e) {
+        var content = $('#addmsg').val();
+        // adapter.datamodel.content = content;
+        // adapter.notifyDataChanged();
+        controller.set({ content: content, confirm: '确定1' });
+        controller.show();
+      });
+
+    })();
+
+    (function () {
+
+      var tmpt = $('#template-calendar').html();
+
+      var CalendarView = _.inherit(Dalmatian.View, {
+        templateSet: {
+          0: tmpt
+        },
+
+        statusSet: {
+          STATUS_INIT: 0
+        }
+      });
+
+      var CalendarAdapter = _.inherit(Dalmatian.Adapter, {
+        _initialize: function ($super) {
+          $super();
+
+          //默认显示方案，可以根据参数修改
+          //任意一个model发生改变皆会引起update
+          this.weekDayItemTmpt = ['日', '一', '二', '三', '四', '五', '六'];
+        },
+
+        //该次重新，viewmodel的数据完全来源与parse中多定义
+        parse: function (data) {
+          return _.extend({
+            weekDayItemTmpt: this.weekDayItemTmpt
+          }, data);
+        }
+      });
+
+      var CalendarController = _.inherit(Dalmatian.ViewController, {
+
+        _initialize: function () {
+          this.view = new CalendarView();
+          this.adapter = new CalendarAdapter();
+
+          //默认业务数据
+          this.dateObj = new Date();
+          this.container = '.containerCalendar';
+
+          var s = '';
+        },
+
+        initialize: function ($super, opts) {
+          this._initialize();
+          $super(opts);
+
+          //事件注册点，应该单独封装
+          Dalmatian.MSG.register('ui', 'alertShow', $.proxy(function (data) {
+            var date = new Date(data);
+            this.handleDay(date, function (el) {
+              //*****************
+              //此处该做datamodel操作，暂时不予处理
+              //*****************
+              el.css('color', 'red');
+            });
+            
+            var s = '';
+
+          }, this));
+
+        },
+
+        onViewBeforeCreate: function () {
+
+          //使用adpter之前必须注册监听以及格式化viewModel，此操作应该封装起来
+          this.adapter.registerObserver(this);
+          this.adapter.format(this._getMonthData(this.dateObj.getFullYear(), this.dateObj.getMonth()));
+
+          //view显示之前必定会给予状态，此应该封装
+          this.viewstatus = this.view.statusSet.STATUS_INIT;
+
+          var s = '';
+        },
+
+        render: function () {
+
+          //该操作可封装
+          var data = this.adapter.viewmodel;
+
+          console.log(data)
+
+          this.view.render(this.viewstatus, data);
+        },
+
+        //根据传入年月，返回该月相关数据
+        _getMonthData: function (year, month) {
+          this.date = new Date(year, month);
+          var d = new Date(year, month);
+          //description 获取天数
+          var days = dateUtil.getDaysOfMonth(d);
+          //description 获取那个月第一天时星期几
+          var _beginWeek = dateUtil.getBeginDayOfMouth(d);
+          return {
+            year: d.getFullYear(),
+            month: d.getMonth(),
+            beginWeek: _beginWeek,
+            days: days,
+            compaign: null
+          };
+        },
+
+
+        handleDay: function (dateStr, fn) {
+          if (dateUtil.isDate(dateStr)) dateStr = dateUtil.format(dateStr, 'Y-m-d');
+          var el = this.viewcontent.find('[data-date="' + dateStr + '"]');
+
+          if (typeof fn == 'function') fn(el, dateUtil.parse(dateStr, 'y-m-d'), this);
+
+        }
+
+      });
+
+      var calendar = new CalendarController();
+      calendar.show();
+
+      calendar.handleDay(new Date(), function (el, date, calendar) {
+        el.html('今天');
+      });
+
+    })();    
+
+  </script>
+</body>
+</html>
