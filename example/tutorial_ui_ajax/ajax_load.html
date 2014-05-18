@@ -56,100 +56,97 @@
   <script src="../../src/mvc-wl.js" type="text/javascript"></script>
   <script type="text/javascript">
 
-    //模拟Ajax请求
-    function getAjaxData(callback, data) {
-      setTimeout(function () {
-        if (!data) {
-          data = [];
-          for (var i = 0; i < 5; i++) {
-            data.push({ title: '我是标题_' + i });
-          }
-        }
-        callback(data);
-      }, 1000);
+//模拟Ajax请求
+function getAjaxData(callback, data) {
+  setTimeout(function () {
+    if (!data) {
+      data = [];
+      for (var i = 0; i < 5; i++) {
+        data.push({ title: '我是标题_' + i });
+      }
     }
+    callback(data);
+  }, 1000);
+}
 
-    var AjaxView = _.inherit(Dalmatian.View, {
-      _initialize: function ($super) {
-        //设置默认属性
-        $super();
+var AjaxView = _.inherit(Dalmatian.View, {
+  _initialize: function ($super) {
+    //设置默认属性
+    $super();
 
-        this.templateSet = {
-          init: $('#template-ajax-init').html(),
-          loading: $('#template-ajax-loading').html(),
-          ajaxSuc: $('#template-ajax-suc').html()
-        };
+    this.templateSet = {
+      init: $('#template-ajax-init').html(),
+      loading: $('#template-ajax-loading').html(),
+      ajaxSuc: $('#template-ajax-suc').html()
+    };
 
-        this.wrapperSet = {
-          loading: '.cui-error-tips',
-          ajaxSuc: '.cui-error-tips'
-        };
-      }
-    });
+    this.wrapperSet = {
+      loading: '.cui-error-tips',
+      ajaxSuc: '.cui-error-tips'
+    };
+  }
+});
 
-    var AjaxAdapter = _.inherit(Dalmatian.Adapter, {
-      _initialize: function ($super) {
-        $super();
-        this.datamodel = {
-          title: '标题',
-          confirm: '刷新数据'
-        };
-        this.datamodel.ajaxData = {};
-      },
+var AjaxAdapter = _.inherit(Dalmatian.Adapter, {
+  _initialize: function ($super) {
+    $super();
+    this.datamodel = {
+      title: '标题',
+      confirm: '刷新数据'
+    };
+    this.datamodel.ajaxData = {};
+  },
 
-      format: function (datamodel) {
-        //处理datamodel生成viewModel的逻辑
-        return datamodel;
-      },
+  format: function (datamodel) {
+    //处理datamodel生成viewModel的逻辑
+    return datamodel;
+  },
 
-      ajaxLoading: function () {
-        this.setStatus('loading');
-        this.notifyDataChanged();
-      },
+  ajaxLoading: function () {
+    this.setStatus('loading');
+    this.notifyDataChanged();
+  },
 
-      ajaxSuc: function (data) {
-        this.datamodel.ajaxData = data;
-        this.setStatus('ajaxSuc');
-        this.notifyDataChanged();
-      }
-    });
+  ajaxSuc: function (data) {
+    this.datamodel.ajaxData = data;
+    this.setStatus('ajaxSuc');
+    this.notifyDataChanged();
+  }
+});
 
-    var AjaxViewController = _.inherit(Dalmatian.ViewController, {
-      _initialize: function ($super) {
-        $super();
-        //设置基本的属性
-        this.view = new AjaxView();
-        this.adapter = new AjaxAdapter();
-        this.viewstatus = 'init';
-        this.container = '#container';
-      },
+var AjaxViewController = _.inherit(Dalmatian.ViewController, {
+  _initialize: function ($super) {
+    $super();
+    //设置基本的属性
+    this.view = new AjaxView();
+    this.adapter = new AjaxAdapter();
+    this.viewstatus = 'init';
+    this.container = '#container';
+  },
 
-      //显示后Ajax请求数据
-      onViewAfterShow: function () {
-        this._handleAjax();
-      },
+  //显示后Ajax请求数据
+  onViewAfterShow: function () {
+    this._handleAjax();
+  },
 
-      _handleAjax: function (data) {
-        this.adapter.ajaxLoading();
-        getAjaxData($.proxy(function (data) {
-          this.adapter.ajaxSuc(data);
-        }, this), data);
-      },
+  _handleAjax: function (data) {
+    this.adapter.ajaxLoading();
+    getAjaxData($.proxy(function (data) {
+      this.adapter.ajaxSuc(data);
+    }, this), data);
+  },
 
-      events: {
-        'click .cui-btns-sure': function () {
-          var data = this.$el.find('#ajax_data').val();
-          data = eval('(' + data + ')');
-          this._handleAjax(data);
-        }
-      }
+  events: {
+    'click .cui-btns-sure': function () {
+      var data = this.$el.find('#ajax_data').val();
+      data = eval('(' + data + ')');
+      this._handleAjax(data);
+    }
+  }
+});
 
-    });
-
-    var a = new AjaxViewController();
-    a.show();
-
-
+var a = new AjaxViewController();
+a.show();
 
   </script>
 </body>
