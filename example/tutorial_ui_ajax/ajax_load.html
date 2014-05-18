@@ -1,0 +1,156 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ToDoList</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="http://designmodo.github.io/Flat-UI/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="http://designmodo.github.io/Flat-UI/css/flat-ui.css">
+  <link href="../style/main.css" rel="stylesheet" type="text/css" />
+  <style type="text/css">
+    .cui-alert { width: auto; position: static; }
+    .txt { border: #cfcfcf 1px solid; margin: 10px 0; width: 80%; }
+    ul, li { padding: 0; margin: 0; }
+    .cui_calendar, .cui_week { list-style: none; }
+    .cui_calendar li, .cui_week li { float: left; width: 14%; overflow: hidden; padding: 4px 0; text-align: center; }
+  </style>
+</head>
+<body>
+  <article id="container">
+  </article>
+  <script type="text/underscore-template" id="template-ajax-init">
+      <div class="cui-alert" >
+        <div class="cui-pop-box">
+          <div class="cui-hd">
+            <%=title%>
+          </div>
+          <div class="cui-bd">
+            <div class="cui-error-tips">
+            </div>
+            <div class="cui-roller-btns" style="padding: 4px; "><input type="text" placeholder="请设置数据 [{ title: ''},{ title: ''}]" style="margin: 2px; width: 100%; " id="ajax_data" class="txt"></div>
+            <div class="cui-roller-btns">
+              <div class="cui-flexbd cui-btns-sure"><%=confirm%></div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </script>
+  <script type="text/underscore-template" id="template-ajax-suc">
+    <ul>
+    <% console.log(ajaxData) %>
+    <%for(var i = 0; i < ajaxData.length; i++) { %>
+      <li><%=ajaxData[i].title %></li>
+    <% } %>
+  </ul>
+  </script>
+  
+  <script type="text/underscore-template" id="template-ajax-loading">
+    loading....
+  </script>
+
+  <script type="text/javascript" src="../../vendor/underscore-min.js"></script>
+  <script type="text/javascript" src="../../vendor/zepto.min.js"></script>
+  <script src="../../src/underscore.extend.js" type="text/javascript"></script>
+  <script src="../../src/util.js" type="text/javascript"></script>
+  <script src="../../src/message-center-wl.js" type="text/javascript"></script>
+  <script src="../../src/mvc-wl.js" type="text/javascript"></script>
+  <script type="text/javascript">
+
+    //模拟Ajax请求
+    function getAjaxData(callback, data) {
+      setTimeout(function () {
+        if (!data) {
+          data = [];
+          for (var i = 0; i < 5; i++) {
+            data.push({ title: '我是标题_' + i });
+          }
+        }
+        callback(data);
+      }, 1000);
+    }
+
+    var AjaxView = _.inherit(Dalmatian.View, {
+      _initialize: function ($super) {
+        //设置默认属性
+        $super();
+
+        this.templateSet = {
+          init: $('#template-ajax-init').html(),
+          loading: $('#template-ajax-loading').html(),
+          ajaxSuc: $('#template-ajax-suc').html()
+        };
+
+        this.wrapperSet = {
+          loading: '.cui-error-tips',
+          ajaxSuc: '.cui-error-tips'
+        };
+      }
+    });
+
+    var AjaxAdapter = _.inherit(Dalmatian.Adapter, {
+      _initialize: function ($super) {
+        $super();
+        this.datamodel = {
+          title: '标题',
+          confirm: '刷新数据'
+        };
+        this.datamodel.ajaxData = {};
+      },
+
+      format: function (datamodel) {
+        //处理datamodel生成viewModel的逻辑
+        return datamodel;
+      },
+
+      ajaxLoading: function () {
+        this.setStatus('loading');
+        this.notifyDataChanged();
+      },
+
+      ajaxSuc: function (data) {
+        this.datamodel.ajaxData = data;
+        this.setStatus('ajaxSuc');
+        this.notifyDataChanged();
+      }
+    });
+
+    var AjaxViewController = _.inherit(Dalmatian.ViewController, {
+      _initialize: function ($super) {
+        $super();
+        //设置基本的属性
+        this.view = new AjaxView();
+        this.adapter = new AjaxAdapter();
+        this.viewstatus = 'init';
+        this.container = '#container';
+      },
+
+      //显示后Ajax请求数据
+      onViewAfterShow: function () {
+        this._handleAjax();
+      },
+
+      _handleAjax: function (data) {
+        this.adapter.ajaxLoading();
+        getAjaxData($.proxy(function (data) {
+          this.adapter.ajaxSuc(data);
+        }, this), data);
+      },
+
+      events: {
+        'click .cui-btns-sure': function () {
+          var data = this.$el.find('#ajax_data').val();
+          data = eval('(' + data + ')');
+          this._handleAjax(data);
+        }
+      }
+
+    });
+
+    var a = new AjaxViewController();
+    a.show();
+
+
+
+  </script>
+</body>
+</html>
