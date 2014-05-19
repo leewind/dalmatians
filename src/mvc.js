@@ -311,6 +311,7 @@ Dalmatian.ViewController = _.inherit({
   */
   render: function () {
     // @notation  这个方法需要被复写
+    // @example
     // var data = this.adapter.format(this.origindata);
     // this.view.render(this.viewstatus, data);
   },
