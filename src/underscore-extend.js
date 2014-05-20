@@ -102,8 +102,7 @@
   method.callmethod = function (method, scope, params) {
     scope = scope || this;
     if (_.isFunction(method)) {
-      method.apply(scope, params);
-      return true;
+      return _.isArray(params) ? method.apply(scope, params) : method.call(scope, params);
     }
 
     return false;
