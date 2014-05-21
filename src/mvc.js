@@ -1,99 +1,5 @@
 "use strict";
 
-// @notation 本框架默认是以来于zepto。这里构建了基础的方法层,当用户使用其他框架时，可能需要复写这几个基础方法
-
-// @description 解析event参数的正则
-var delegateEventSplitter = /^(\S+)\s*(.*)$/;
-// Regular expression used to split event strings.
-var eventSplitter = /\s+/;
-
-// ----------------------------------------------------
-// @notation 从backbone中借鉴而来，用来多事件绑定的events
-
-// Implement fancy features of the Events API such as multiple event
-// names `"change blur"` and jQuery-style event maps `{change: action}`
-// in terms of the existing API.
-var eventoperator = function(obj, action, name, rest) {
-  if (!name) return true;
-
-  // Handle event maps.
-  if (typeof name === 'object') {
-    for (var key in name) {
-      obj[action].apply(obj, [key, name[key]].concat(rest));
-    }
-    return false;
-  }
-
-  // Handle space separated event names.
-  if (eventSplitter.test(name)) {
-    var names = name.split(eventSplitter);
-    for (var i = 0, length = names.length; i < length; i++) {
-      obj[action].apply(obj, [names[i]].concat(rest));
-    }
-    return false;
-  }
-
-  return true;
-};
-// ----------------------------------------------------
-
-// @notation 默认使用zepto的事件委托机制
-function eventmethod(obj, action, name, callback, context, subobj) {
-  // _.bind(callback, context || this);
-
-  var delegate = function(target, eventName, eventCallback, subtarget) {
-    if (subtarget) {
-      target.on(eventName, subtarget, eventCallback);
-    }else{
-      target.on(eventName, eventCallback);
-    }
-  };
-
-  var undelegate = function(target, eventName, eventCallback, subtarget) {
-    if (subtarget) {
-      target.off(eventName, subtarget, eventCallback);
-    }else{
-      target.off(eventName, eventCallback);
-    }
-  };
-
-  var trigger = function(target, eventName, subtarget) {
-    if (subtarget) {
-      target.find(subtarget).trigger(eventName);
-    }else{
-      target.trigger(eventName);
-    }
-  };
-
-  var map = {
-    'on': delegate,
-    'bind': delegate,
-    'off': undelegate,
-    'unbind': undelegate,
-    'trigger': trigger
-  };
-
-  if (_.isFunction(map[action])) {
-    map[action](obj, name, callback, subobj);
-  }
-
-}
-
-// @description 选择器
-function selectDom(selector) {
-  return $(selector);
-}
-
-function domImplement($element, action, context, param) {
-  if (_.isFunction($element[action]))
-    $element[action].apply(context || $element, param);
-}
-
-function createDom (html) {
-  return $(html);
-}
-
-// --------------------------------------------------- //
 // ------------------华丽的分割线--------------------- //
 
 // @description 正式的声明Dalmatian框架的命名空间
@@ -106,7 +12,15 @@ Dalmatian.View = _.inherit({
   initialize: function (options) {
     this._initialize();
     this.handleOptions(options);
+    this._initRoot();
 
+  },
+
+  _initRoot: function () {
+    //根据html生成的dom包装对象
+    //有一种场景是用户的view本身就是一个只有一个包裹器的结构，他不想要多余的包裹器
+    this.root = $(this.defaultContainerTemplate);
+    this.root.attr('id', this.viewid);
   },
 
   // @description 设置默认属性
@@ -149,18 +63,15 @@ Dalmatian.View = _.inherit({
       var templateFn = Dalmatian.template(templateSelected);
       this.html = templateFn(data);
 
-      // @description 在view外层加入外壳
-      templateFn = Dalmatian.template(this.defaultContainerTemplate);
-      this.html = templateFn({
-        viewid: this.viewid,
-        html: this.html
-      });
+      //这里减少一次js编译
+//      this.root.html('');
+//      this.root.append(this.html);
 
       this.currentStatus = status;
 
       _.callmethod(callback, this);
 
-      return true;
+      return this.html;
 
     }
   },
@@ -178,61 +89,65 @@ Dalmatian.View = _.inherit({
     // @override
     // @description 可复写部分，当数据发生变化但是状态没有发生变化时，页面仅仅变化的可以是局部显示
     //              可以通过获取this.html进行修改
-    _.callmethod(this.onUpdate, this);
+    _.callmethod(this.onUpdate, this, data);
   }
 });
 
 Dalmatian.Adapter = _.inherit({
 
   // @description 构造函数入口
-  initialize: function(options) {
+  initialize: function (options) {
     this._initialize();
     this.handleOptions(options);
 
   },
 
   // @description 设置默认属性
-  _initialize: function() {
+  _initialize: function () {
     this.observers = [];
-    this.viewmodel = {};
+    //    this.viewmodel = {};
     this.datamodel = {};
   },
 
   // @description 操作构造函数传入操作
-  handleOptions: function(options) {
+  handleOptions: function (options) {
     // @description 从形参中获取key和value绑定在this上
     if (_.isObject(options)) _.extend(this, options);
   },
 
-  // @description 设置
-  format: function(origindata){
-    this.datamodel = origindata;
-    this.viewmodel = this.parse(origindata);
-    return this.viewmodel;
-  },
-
   // @override
-  // @description parse方法用来将datamodel转化为viewmodel，必须被重写
-  parse: function(origindata) {
-    throw Error('方法必须被重写');
+  // @description 设置
+  format: function (datamodel) {
+    return datamodel;
   },
 
-  registerObserver: function(viewcontroller) {
+  getViewModel: function () {
+    return this.format(this.datamodel);
+  },
+
+  registerObserver: function (viewcontroller) {
     // @description 检查队列中如果没有viewcontroller，从队列尾部推入
     if (!_.contains(this.observers, viewcontroller)) {
       this.observers.push(viewcontroller);
     }
   },
 
-  unregisterObserver: function(viewcontroller) {
+  unregisterObserver: function (viewcontroller) {
     // @description 从observers的队列中剔除viewcontroller
     this.observers = _.without(this.observers, viewcontroller);
   },
 
-  notifyDataChanged: function() {
+  setStatus: function (status) {
+    _.each(this.observers, function (viewcontroller) {
+      if (_.isObject(viewcontroller))
+        viewcontroller.setViewStatus(status);
+    });
+  },
+
+  notifyDataChanged: function () {
     // @description 通知所有注册的观察者被观察者的数据发生变化
-    var data = this.format(this.datamodel);
-    _.each(this.observers, function(viewcontroller) {
+    var data = this.getViewModel();
+    _.each(this.observers, function (viewcontroller) {
       if (_.isObject(viewcontroller))
         _.callmethod(viewcontroller.update, viewcontroller, [data]);
     });
@@ -241,10 +156,35 @@ Dalmatian.Adapter = _.inherit({
 
 Dalmatian.ViewController = _.inherit({
 
+  _initialize: function () {
+
+    //用户设置的容器选择器，或者dom结构
+    this.container;
+    //根元素
+    this.$el;
+
+    //一定会出现
+    this.view;
+    //可能会出现
+    this.adapter;
+    //初始化的时候便需要设置view的状态，否则会渲染失败，这里给一个默认值
+    this.viewstatus = 'init';
+
+  },
+
   // @description 构造函数入口
   initialize: function (options) {
+    this._initialize();
     this.handleOptions(options);
+    this._handleAdapter();
     this.create();
+  },
+
+  //处理dataAdpter中的datamodel，为其注入view的默认容器数据
+  _handleAdapter: function () {
+    //不存在就不予理睬
+    if (!this.adapter) return;
+    this.adapter.registerObserver(this);
   },
 
   // @description 操作构造函数传入操作
@@ -257,75 +197,54 @@ Dalmatian.ViewController = _.inherit({
     if (_.isObject(options)) _.extend(this, options);
   },
 
+  setViewStatus: function (status) {
+    this.viewstatus = status;
+  },
+
   // @description 验证参数
   _verify: function (options) {
-    if (!_.property('view')(options) && (!this.view)) throw Error('view必须在实例化的时候传入ViewController');
+    //这个underscore方法新框架在报错
+    //    if (!_.property('view')(options) && (!this.view)) throw Error('view必须在实例化的时候传入ViewController');
+    if (options.view && (!this.view)) throw Error('view必须在实例化的时候传入ViewController');
   },
 
   // @description 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话，直接调用render方法重绘
   update: function (data) {
 
-    _.callmethod(this.hide, this);
+    //    _.callmethod(this.hide, this);
 
-    if (!_.callmethod(this.onViewUpdate, this, [data])) {
-      this.render();
+    if (this.onViewUpdate) {
+      _.callmethod(this.onViewUpdate, this, [data]);
+      return;
     }
+    this.render();
 
-    _.callmethod(this.show, this);
-  },
-
-  /**
-  * @description 传入事件对象，解析之，解析event，返回对象{events: [{target: '#btn', event:'click', callback: handler}]}
-  * @param events {obj} 事件对象，默认传入唯一id
-  * @param namespace 事件命名空间
-  * @return {obj}
-  */
-  parseEvents: function (events) {
-
-    //用于返回的事件对象
-    var eventArr = [];
-    //注意，此处做简单的字符串数据解析即可，不做实际业务
-    for (var key in events) {
-      var method = events[key];
-      if (!_.isFunction(method)) method = this[events[key]];
-      if (!method) continue;
-
-      var match = key.match(delegateEventSplitter);
-      var eventName = match[1],
-        selector = match[2];
-      method = _.bind(method, this);
-      eventName += '.delegateEvents' + this.view.viewid;
-      eventArr.push({
-        target: selector,
-        event: eventName,
-        callback: method
-      });
-    }
-
-    return eventArr;
+    //    _.callmethod(this.show, this);
   },
 
   /**
   * @override
-  *
   */
   render: function () {
     // @notation  这个方法需要被复写
-    // @example
-    // var data = this.adapter.format(this.origindata);
-    // this.view.render(this.viewstatus, data);
+    this.view.render(this.viewstatus, this.adapter && this.adapter.getViewModel());
   },
 
   _create: function () {
     this.render();
+
+    //render 结束后构建好根元素dom结构
+    this.view.root.html(this.view.html);
+    this.$el = this.view.root;
   },
 
   create: function () {
 
-    var $element = selectDom(this.view.viewid);
-    if (domImplement($element, 'get', false, [0])) {
-      return _.callmethod(this.recreate, this);
-    }
+    //l_wang这块不是很明白
+    //是否检查映射关系，不存在则recreate，但是在这里dom结构未必在document上
+    //    if (!$('#' + this.view.viewid)[0]) {
+    //      return _.callmethod(this.recreate, this);
+    //    }
 
     // @notation 在create方法调用前后设置onViewBeforeCreate和onViewAfterCreate两个回调
     _.wrapmethod(this._create, 'onViewBeforeCreate', 'onViewAfterCreate', this);
@@ -343,59 +262,63 @@ Dalmatian.ViewController = _.inherit({
     _.wrapmethod(this._recreate, 'onViewBeforeRecreate', 'onViewAfterRecreate', this);
   },
 
-  _bind: function () {
-    this.viewcontent = createDom(this.view.html);
+  //事件注册点
+  bindEvents: function (events) {
+    if (!(events || (events = _.result(this, 'events')))) return this;
+    this.unBindEvents();
 
-    var eventsList = this.parseEvents(this.events);
+    // @description 解析event参数的正则
+    var delegateEventSplitter = /^(\S+)\s*(.*)$/;
+    var key, method, match, eventName, selector;
 
-    var scope = this;
-    _.each(eventsList, function (item) {
+    //注意，此处做简单的字符串数据解析即可，不做实际业务
+    for (key in events) {
+      method = events[key];
+      if (!_.isFunction(method)) method = this[events[key]];
+      if (!method) continue;
 
-      if (item.target === '') {
-        eventmethod(scope.viewcontent, 'on', item.event, item.callback, scope);
+      match = key.match(delegateEventSplitter);
+      eventName = match[1], selector = match[2];
+      method = _.bind(method, this);
+      eventName += '.delegateEvents' + this.view.viewid;
+
+      if (selector === '') {
+        this.$el.on(eventName, method);
       } else {
-        eventmethod(scope.viewcontent, 'on', item.event, item.callback, scope, item.target);
+        this.$el.on(eventName, selector, method);
       }
+    }
 
-    });
+    return this;
   },
 
-  bind: function () {
-    _.wrapmethod(this._bind, 'onViewBeforeBind', 'onViewAfterBind', this);
+  //取消所有事件
+  unBindEvents: function () {
+    this.$el.off('.delegateEvents' + this.view.viewid);
+    return this;
   },
 
   _show: function () {
-    var $element = selectDom('#' + this.view.viewid);
-
-    // @notation 需要剔除码？
-    // if ((!$element || $element.length === 0) && this.viewcontent) {
-    var $container = selectDom(this.container);
-    domImplement($container, 'html', false, [this.viewcontent]);
-    // }
-
-    domImplement($element, 'show');
+    this.bindEvents();
+    $(this.container).append(this.$el);
+    this.$el.show();
   },
 
   show: function () {
-    this.bind();
-
     _.wrapmethod(this._show, 'onViewBeforeShow', 'onViewAfterShow', this);
   },
 
   _hide: function () {
-    var $element = selectDom('#' + this.view.viewid);
-    domImplement($element, 'hide');
+    this.forze();
+    this.$el.hide();
   },
 
   hide: function () {
     _.wrapmethod(this._hide, 'onViewBeforeHide', 'onViewAfterHide', this);
-
-    this.forze();
   },
 
   _forze: function () {
-    var $element = selectDom('#' + this.view.viewid);
-    domImplement($element, 'off');
+    this.unBindEvents();
   },
 
   forze: function () {
@@ -403,8 +326,9 @@ Dalmatian.ViewController = _.inherit({
   },
 
   _destory: function () {
-    var $element = selectDom('#' + this.view.viewid).remove();
-    domImplement($element, 'remove');
+    this.unBindEvents();
+    this.$el.remove();
+    //    delete this;
   },
 
   destory: function () {

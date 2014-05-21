@@ -1,7 +1,7 @@
 ﻿(function () {
-
+  var _ = window._;
   if (typeof require === 'function' && !_) {
-    var _ = require('underscore');
+    _ = require('underscore');
   };
 
   // @description 全局可能用到的变量
@@ -123,7 +123,7 @@
       query[_tmp[0]] = _tmp[1];
     }
 
-    return name ? query[name]: query;
+    return name ? query[name] : query;
   };
 
 
@@ -271,19 +271,12 @@
 
     }
 
-
-
-
-
-
   });
-
-
 
   _.extend(_, method);
 
 
-  if (module && module.exports)
-    module.exports = _;
+//  if (module && module.exports)
+//    module.exports = _;
 
 }).call(this);
