@@ -108,6 +108,25 @@
     return false;
   };
 
+  //获取url参数
+  method.getUrlParam = function (url, name) {
+    var i, arrQuery, _tmp, query = {};
+    var index = url.lastIndexOf('//');
+    var http = url.substr(index, url.length);
+
+    url = url.substr(0, index);
+    arrQuery = url.split('&');
+
+    for (i = 0, len = arrQuery.length; i < len; i++) {
+      _tmp = arrQuery[i].split('=');
+      if (i == len - 1) _tmp[1] += http;
+      query[_tmp[0]] = _tmp[1];
+    }
+
+    return name ? query[name]: query;
+  };
+
+
   /**
   * @description 在fn方法的前后通过键值设置两个传入的回调
   * @param fn {function} 调用的方法
@@ -129,7 +148,136 @@
     });
 
     return _.callmethod(action, scope);
-  }
+  };
+
+  method.Hash = method.inherit({
+    inisilize: function (opts) {
+      this.keys = [];
+      this.values = [];
+    },
+
+    length: function () {
+      return this.keys.length;
+    },
+
+    //传入order，若是数组中存在的话会将之放到最后，保证数组的唯一性，因为这个是hash，不能存在重复的键
+    push: function (key, value, order) {
+      if (_.isObject(key)) {
+        for (var i in key) {
+          if (key.hasOwnProperty(i)) this.push(i, key[i], order);
+        }
+        return;
+      }
+
+      var index = _.indexOf(key, this.keys);
+
+      if (index != -1 && !order) {
+        this.values[index] = value;
+      } else {
+        if (order) this.remove(key);
+        this.keys.push(key);
+        this.vaules.push(value);
+      }
+
+    },
+
+    remove: function (key) {
+      return this.removeByIndex(_.indexOf(key, this.keys));
+    },
+
+    removeByIndex: function (index) {
+      if (index == -1) return this;
+
+      this.keys.splice(index, 1);
+      this.values.splice(index, 1);
+
+      return this;
+    },
+
+    pop: function () {
+      if (!this.length()) return;
+
+      this.keys.pop();
+      return this.values.pop();
+    },
+
+    //根据索引返回对应键值
+    indexOf: function (value) {
+      var index = _.indexOf(value, this.vaules);
+      if (index != -1) return this.keys[index];
+      return -1;
+    },
+
+    //移出栈底值
+    shift: function () {
+      if (!this.length()) return;
+
+      this.keys.shift();
+      return this.values.shift();
+    },
+
+    //往栈顶压入值
+    unShift: function (key, vaule, order) {
+      if (_.isObject(key)) {
+        for (var i in key) {
+          if (key.hasOwnProperty(i)) this.unShift(i, key[i], order);
+        }
+        return;
+      }
+      if (order) this.remove(key);
+      this.keys.unshift(key);
+      this.vaules.unshift(value);
+    },
+
+    //返回hash表的一段数据
+    //
+    slice: function (start, end) {
+      var keys = this.keys.slice(start, end || null);
+      var values = this.values.slice(start, end || null);
+      var hash = new _.Hash();
+
+      for (var i = 0; i < keys.length; i++) {
+        hash.push(keys[i], values[i]);
+      }
+
+      return obj;
+    },
+
+    //由start开始，移除元素
+    splice: function (start, count) {
+      var keys = this.keys.splice(start, end || null);
+      var values = this.values.splice(start, end || null);
+      var hash = new _.Hash();
+
+      for (var i = 0; i < keys.length; i++) {
+        hash.push(keys[i], values[i]);
+      }
+
+      return obj;
+    },
+
+    exist: function (key, value) {
+      var b = true;
+
+      if (_.indexOf(key, this.keys) == -1) b = false;
+
+      if (!_.isUndefined(value) && _.indexOf(value, this.values) == -1) b = false;
+
+      return b;
+    },
+
+
+    filter: function () {
+
+    }
+
+
+
+
+
+
+  });
+
 
 
   _.extend(_, method);

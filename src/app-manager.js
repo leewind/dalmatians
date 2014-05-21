@@ -7,7 +7,7 @@ var Application = _.inherit({
   defaultPropery: function () {
 
     //存储view队列的hash对象，这里会新建一个hash数据结构，暂时不予理睬
-    this.views = {};
+    this.views = new _.Hash();
 
     //当前view
     this.curView;
@@ -30,8 +30,31 @@ var Application = _.inherit({
     //view的根目录
     this.viewRootPath = 'app/views/';
 
-    this.animAPIs = {};
+    this.animtAPIs = {};
     this.animatName = 'no';
+
+    //当前对应url请求
+    this.request = {};
+
+    //当前对应的参数
+    this.query = {};
+
+    //pushState的支持能力
+    this.hasPushState = !!(this.history && this.history.pushState);
+
+    //由用户定义的获取viewid规则
+    this.getViewIdRules = function (url, hasPushState) {
+      return _.getUrlParam(url, 'viewId');
+    };
+
+  },
+
+  //动画操作函数暂时封装于此
+  addAnimat: function (key, callback) {
+
+  },
+
+  removeAnimat: function (key) {
 
   },
 
@@ -40,7 +63,7 @@ var Application = _.inherit({
     _.extend(this, opts);
   },
 
-  initializ: function (opts) {
+  initialize: function (opts) {
 
     this.defaultPropery();
     this.handleOptions(opts);
@@ -55,7 +78,8 @@ var Application = _.inherit({
   buildEvent: function () {
     this._requireEvent();
     this._routeEvent();
-
+    this._flipEvent();
+    this._fastClickEvent();
   },
 
   _requireEvent: function () {
@@ -77,6 +101,27 @@ var Application = _.inherit({
 
   },
 
+  _flipEvent: function () {
+
+  },
+
+  _fastClickEvent: function () {
+
+  },
+
+  //解析的当前url
+  parseUrl: function (url) {
+
+
+
+  },
+
+  //根据之前配置，以及url解析出当前viewid，规则由用户制定
+  _getViewId: function (url) {
+
+    return this.getViewIdRules(url);
+  },
+
   //入口点
   start: function () {
     var url = decodeURIComponent(window.location.hash.replace(/^#+/i, '')).toLowerCase();
@@ -96,13 +141,11 @@ var Application = _.inherit({
 
     this.switchView(viewId);
 
-
   },
 
   //根据viewId判断当前view是否实例化
   viewExist: function (viewId) {
-
-    return false;
+    return this.views.exist(viewId);
   },
 
 
@@ -146,14 +189,12 @@ var Application = _.inherit({
   switchView: function (viewId) {
     if (!viewId) return;
 
-    //    this.loadView();
-
-
     this.loadView(viewId, function (view) {
       this.lastView = this.curView;
       this.curView = view;
 
-      //这里消去动画逻辑
+      //动画逻辑
+      this.startAnimation(this.curView, this.lastView);
 
     });
 
@@ -165,7 +206,7 @@ var Application = _.inherit({
 
     //若是存在outView就需要动画，否则直接显示即可
 
-    if (!outView) { inView.show(); this._onSwitchEnd(inView);  return; }
+    if (!outView) { inView.show(); this._onSwitchEnd(inView); return; }
 
     var switchFn = this.animAPIs[this.animatName];
 
@@ -186,8 +227,7 @@ var Application = _.inherit({
 
   },
 
-
-  //根据viewId显示一个view
+  //根据viewId显示一个view，用于在view中妄想加载view的操作
   showView: function (id, callback) {
     if (!id) return;
     this.loadView(id, function (view) {
