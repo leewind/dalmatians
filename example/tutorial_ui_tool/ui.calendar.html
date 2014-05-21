@@ -38,11 +38,11 @@
       <% } %>
     </ul>
   </script>
-  <script type="text/javascript" src="../../vendor/underscore-min.js"></script>
-  <script type="text/javascript" src="../../vendor/zepto.min.js"></script>
-  <script src="../../src/underscore.extend.js" type="text/javascript"></script>
+  <script type="text/javascript" src="../../vendor/underscore.js"></script>
+  <script type="text/javascript" src="../../vendor/zepto.js"></script>
+  <script src="../../src/underscore-extend.js" type="text/javascript"></script>
   <script src="../../src/util.js" type="text/javascript"></script>
-  <script src="../../src/mvc-wl.js" type="text/javascript"></script>
+  <script src="../../src/mvc.js" type="text/javascript"></script>
   <script type="text/javascript">
     var tmpt = $('#template-calendar').html();
 
@@ -60,9 +60,15 @@
       _initialize: function ($super) {
         $super();
 
-        //默认显示方案，可以根据参数修改
-        //任意一个model发生改变皆会引起update
-        this.weekDayItemTmpt = ['日', '一', '二', '三', '四', '五', '六'];
+        this.datamodel = {};
+        this.datamodel.weekDayItemTmpt = ['日', '一', '二', '三', '四', '五', '六'];
+
+
+      },
+
+      format: function (datamodel) {
+        //处理datamodel生成viewModel的逻辑
+        return datamodel;
       },
 
       //该次重新，viewmodel的数据完全来源与parse中多定义
