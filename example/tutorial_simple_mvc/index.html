@@ -5,55 +5,56 @@
   <title>example</title>
 </head>
 <body>
-  <script type="text/javascript" src="../../vendor/underscore-min.js"></script>
-  <script type="text/javascript" src="../../vendor/zepto.min.js"></script>
-  <script src="../../src/underscore.extend.js" type="text/javascript"></script>
+  <script type="text/javascript" src="../../vendor/underscore.js"></script>
+  <script type="text/javascript" src="../../vendor/zepto.js"></script>
+  <script src="../../src/underscore-extend.js" type="text/javascript"></script>
   <script src="../../src/mvc.js" type="text/javascript"></script>
 
   <script type="text/javascript">
     window.onload = function () {
       var ExampleView = _.inherit(Dalmatian.View, {
-      });
-
-      var exampleView = new ExampleView({
-        templateSet: {
-          0: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="cancelBtn">取消</button></div>',
-          1: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="confirmBtn">确定</button></div>',
-          2: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="failedBtn" disabled>失败</button></div>'
-        },
-        statusSet: {
-          STATUS_CANCEL: 0,
-          STATUS_SUCCESS: 1,
-          STATUS_FAIL: 2
+        _initialize: function ($super) {
+          //设置默认属性
+          $super();
+          this.templateSet = {
+            STATUS_CANCEL: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="cancelBtn">取消</button></div>',
+            STATUS_SUCCESS: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="confirmBtn">确定</button></div>',
+            STATUS_FAIL: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul><div><button id="failedBtn" disabled>失败</button></div>'
+          };
         }
 
       });
-
-      var origindata = {
-        cities: [
-          { name: '上海', id: 1 },
-          { name: '北京', id: 2 }
-        ]
-      }
 
       var ExampleAdapter = _.inherit(Dalmatian.Adapter, {
-        parse: function (origindata) {
-          return { list: origindata.cities };
+        _initialize: function ($super) {
+          $super();
+          this.datamodel = {
+            cities: [
+              { name: '上海', id: 1 },
+              { name: '北京', id: 2 }
+            ]
+          };
+        },
+        format: function (datamodel) {
+          return { list: datamodel.cities };
         }
       });
 
+      var exampleView = new ExampleView();
       var exampleAdapter = new ExampleAdapter();
 
-      var exampleViewController = new Dalmatian.ViewController({
-        view: exampleView,
-        adapter: exampleAdapter,
-        container: 'body',
-        onViewBeforeCreate: function () {
-          this.origindata = origindata
-          this.viewstatus = this.view.statusSet.STATUS_CANCEL
+      var ViewController = _.inherit(Dalmatian.ViewController, {
+        _initialize: function ($super) {
+          $super();
+          this.view = exampleView;
+          this.adapter = exampleAdapter;
+          this.container = 'body';
+          this.viewstatus = 'STATUS_SUCCESS';
         }
+
       });
 
+      var exampleViewController = new ViewController();
       exampleViewController.show()
 
       setTimeout(function () {
