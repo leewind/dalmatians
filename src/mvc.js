@@ -137,12 +137,13 @@ Dalmatian.Adapter = _.inherit({
     this.observers = _.without(this.observers, viewcontroller);
   },
 
-  setStatus: function (status) {
-    _.each(this.observers, function (viewcontroller) {
-      if (_.isObject(viewcontroller))
-        viewcontroller.setViewStatus(status);
-    });
-  },
+  //统一设置所有观察者的状态，因为对应观察者也许根本不具备相关状态，所以这里需要处理
+//  setStatus: function (status) {
+//    _.each(this.observers, function (viewcontroller) {
+//      if (_.isObject(viewcontroller))
+//        viewcontroller.setViewStatus(status);
+//    });
+//  },
 
   notifyDataChanged: function () {
     // @description 通知所有注册的观察者被观察者的数据发生变化

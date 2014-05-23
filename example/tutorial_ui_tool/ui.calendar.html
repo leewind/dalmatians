@@ -33,7 +33,6 @@
       <% } %>
       <% for(i = 0; i < days; i++) { %>
         <% day = i + 1; %>
-        <% if (compaign && compaign.days && compaign.sign && _.contains(compaign.days, day)) { day = compaign.sign } %>
         <li class="cui_calendar_item" data-date="<%=year%>-<%=month + 1%>-<%=day%>"><%=day %></li>
       <% } %>
     </ul>
@@ -44,15 +43,28 @@
   <script src="../../src/util.js" type="text/javascript"></script>
   <script src="../../src/mvc.js" type="text/javascript"></script>
   <script type="text/javascript">
+
+    //模拟Ajax请求
+    function getAjaxData(callback, data) {
+      setTimeout(function () {
+        if (!data) {
+          data = { day: 3, price: 20 };
+        }
+        callback(data);
+      }, 1000);
+    }
+
     var tmpt = $('#template-calendar').html();
 
     var CalendarView = _.inherit(Dalmatian.View, {
-      templateSet: {
-        0: tmpt
-      },
+      _initialize: function ($super) {
+        //设置默认属性
+        $super();
 
-      statusSet: {
-        STATUS_INIT: 0
+        this.templateSet = {
+          init: tmpt,
+          price: '<span>$<%=price.price %></span>'
+        };
       }
     });
 
@@ -62,8 +74,7 @@
 
         this.datamodel = {};
         this.datamodel.weekDayItemTmpt = ['日', '一', '二', '三', '四', '五', '六'];
-
-
+        this.datamodel.price = {};
       },
 
       format: function (datamodel) {
@@ -71,17 +82,18 @@
         return datamodel;
       },
 
-      //该次重新，viewmodel的数据完全来源与parse中多定义
-      parse: function (data) {
-        return _.extend({
-          weekDayItemTmpt: this.weekDayItemTmpt
-        }, data);
+      setPrice: function (data) {
+        this.datamodel.price = data;
+        this.notifyDataChanged();
       }
+
     });
 
     var CalendarController = _.inherit(Dalmatian.ViewController, {
 
-      _initialize: function () {
+      _initialize: function ($super) {
+        $super();
+
         this.view = new CalendarView();
         this.adapter = new CalendarAdapter();
 
@@ -89,34 +101,46 @@
         this.dateObj = new Date();
         this.container = '.container';
 
-        var s = '';
+        //最低价dom需要动态定位
+        this.priceEl = null;
+
+        this.viewstatus = 'init';
+        _.extend(this.adapter.datamodel, this._getMonthData(this.dateObj.getFullYear(), this.dateObj.getMonth()));
+
       },
 
       initialize: function ($super, opts) {
-        this._initialize();
         $super(opts);
-      },
-
-      onViewBeforeCreate: function () {
-
-        //使用adpter之前必须注册监听以及格式化viewModel，此操作应该封装起来
-        this.adapter.registerObserver(this);
-        this.adapter.format(this._getMonthData(this.dateObj.getFullYear(), this.dateObj.getMonth()));
-
-        //view显示之前必定会给予状态，此应该封装
-        this.viewstatus = this.view.statusSet.STATUS_INIT;
-
-        var s = '';
       },
 
       render: function () {
 
         //该操作可封装
-        var data = this.adapter.viewmodel;
+        var data = this.adapter.getViewModel();
+        var root = this.view.root;
+        if (this.priceEl && this.viewstatus == 'price') {
+          root = this.priceEl;
+        }
+        this.view.render(this.viewstatus, this.adapter && this.adapter.getViewModel());
+        root.html(this.view.html);
 
-        console.log(data)
+      },
 
-        this.view.render(this.viewstatus, data);
+      onViewAfterShow: function () {
+        getAjaxData($.proxy(function (data) {
+          var d = new Date();
+          var str = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + data.day;
+
+          this.handleDay(str, function (el, date) {
+            this.setViewStatus('price');
+            this.priceEl = el;
+            this.adapter.setPrice(data);
+
+          });
+
+          var s = '';
+
+        }, this));
       },
 
       //根据传入年月，返回该月相关数据
@@ -138,10 +162,8 @@
 
       handleDay: function (dateStr, fn) {
         if (dateUtil.isDate(dateStr)) dateStr = dateUtil.format(dateStr, 'Y-m-d');
-        var el = this.viewcontent.find('[data-date="' + dateStr + '"]');
-
-        if (typeof fn == 'function') fn(el, dateUtil.parse(dateStr, 'y-m-d'), this);
-
+        var el = this.$el.find('[data-date="' + dateStr + '"]');
+        if (typeof fn == 'function') fn.apply(this, [el, dateUtil.parse(dateStr, 'y-m-d')]);
       }
 
     });
@@ -149,24 +171,9 @@
     var calendar = new CalendarController();
     calendar.show();
 
-    calendar.handleDay(new Date(), function (el, date, calendar) {
-      el.html('今天');
-    });
-
-    setTimeout(function() {
+    s = '';
 
 
-      // @notation 这里就是对datamodel的修改，所有对datamodel的修改都可以被保存下来
-      // 上文里，你直接处理今天，由于没有修改datamodel，所以状态没有被保持下来
-
-      calendar.adapter.datamodel.compaign = {
-        days: [ 7,8,9 ],
-        sign: '低价'
-      };
-
-      calendar.adapter.notifyDataChanged();
-
-    }, 5000);
 
   </script>
 </body>
