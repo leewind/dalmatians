@@ -63,7 +63,7 @@
 
         this.templateSet = {
           init: tmpt,
-          price: '<span>$<%=price.price %></span>'
+          price: '<span style="color: red; ">$<%=price.price %></span>'
         };
       }
     });
@@ -118,6 +118,8 @@
         //该操作可封装
         var data = this.adapter.getViewModel();
         var root = this.view.root;
+
+        //this.priceEl 选择而出
         if (this.priceEl && this.viewstatus == 'price') {
           root = this.priceEl;
         }
@@ -138,9 +140,9 @@
 
           });
 
-          var s = '';
-
         }, this));
+
+
       },
 
       //根据传入年月，返回该月相关数据

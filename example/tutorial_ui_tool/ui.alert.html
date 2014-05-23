@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -31,10 +31,94 @@
         </div>
       </div>
   </script>
-  <script type="text/javascript" src="../../vendor/underscore-min.js"></script>
-  <script type="text/javascript" src="../../vendor/zepto.min.js"></script>
-  <script src="../../src/underscore.extend.js" type="text/javascript"></script>
+  <script type="text/javascript" src="../../vendor/underscore.js"></script>
+  <script type="text/javascript" src="../../vendor/zepto.js"></script>
+  <script src="../../src/underscore-extend.js" type="text/javascript"></script>
   <script src="../../src/mvc.js" type="text/javascript"></script>
-  <script type="text/javascript" src="ui.alert.js"></script>
+  <script type="text/javascript" >
+    var htmltemplate = $('#template-alert').html();
+
+    var AlertView = _.inherit(Dalmatian.View, {
+      _initialize: function ($super) {
+        $super();
+        this.templateSet = { 'init': htmltemplate };
+      }
+    });
+
+
+    var Adapter = _.inherit(Dalmatian.Adapter, {
+      _initialize: function ($super) {
+        $super();
+        this.datamodel = {
+          content: '请输入文本',
+          confirm: '确定',
+          cancel: '取消'
+        };
+      },
+      setContent: function (content) {
+        this.datamodel.content = content;
+        this.notifyDataChanged();
+      }
+
+    });
+
+    var Controller = _.inherit(Dalmatian.ViewController, {
+      //设置默认信息
+      _initialize: function ($super) {
+        $super();
+        this.view = new AlertView();
+        this.adapter = new Adapter();
+        this.container = '.container';
+
+      },
+
+      initialize: function ($super, opts) {
+        $super(opts);
+      },
+
+      render: function () {
+        this.view.render(this.viewstatus, this.adapter && this.adapter.getViewModel());
+        this.view.root.html(this.view.html);
+
+      },
+
+      setContent: function (str) {
+        this.adapter.setContent(str);
+      },
+
+      setAction: function (sureAction, cancelAction) {
+        this.sureaction = sureAction;
+        this.cancelaction = cancelAction;
+      },
+
+      events: {
+        "click .cui-btns-cancel": "onCancelAction",
+        'click .cui-btns-sure': 'onSureAction'
+      },
+
+      onCancelAction: function (e) {
+        this.cancelaction && this.cancelaction.call(this, e);
+      },
+
+      onSureAction: function (e) {
+        this.sureaction && this.sureaction.call(this, e);
+      }
+
+    });
+
+    var controller = new Controller();
+    controller.show();
+
+    $('#addbtn').on('click', function (e) {
+      var content = $('#addmsg').val();
+      controller.setContent(content);
+      controller.setAction(function () {
+        alert(content);
+      }, function () {
+        alert('cancel');
+      })
+    });
+  
+  </script>
 </body>
 </html>
