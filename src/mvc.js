@@ -265,7 +265,7 @@ Dalmatian.ViewController = _.inherit({
   },
 
   //事件注册点
-  bindEvents: function () {
+  bindEvents: function (events) {
     if (!(events || (events = _.result(this, 'events')))) return this;
     this.unBindEvents();
 
