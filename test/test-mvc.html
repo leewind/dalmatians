@@ -13,6 +13,28 @@
       }
     </script>
 
+
+  </head>
+  <body>
+
+    <div class="container"></div>
+    <div id="mocha"></div>
+
+    <script type="text/underscore-template" id="template-alert">
+      <div class=" cui-alert" >
+        <div class="cui-pop-box">
+          <div class="cui-bd">
+            <p class="cui-error-tips"><%=content%></p>
+            <div class="cui-roller-btns">
+              <div class="cui-flexbd cui-btns-cancel"><%=cancel%></div>
+              <div class="cui-flexbd cui-btns-sure"><%=confirm%></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </script>
+
+    <script src="../vendor/zepto.js"></script>
     <script src="../vendor/underscore-min.js"></script>
     <script src="../src/underscore-extend.js"></script>
     <script src="../src/mvc.js"></script>
@@ -24,8 +46,6 @@
         var runner = mocha.run();
       };
     </script>
-  </head>
-  <body>
-    <div id="mocha"></div>
+
   </body>
 </html>
