@@ -2,11 +2,12 @@ var htmltemplate = $('#template-alert').html();
 
 var AlertView = _.inherit(Dalmatian.View, {
   initialize: function ($super, options) {
-    $super(options);
     this.statusSet = {
       'INIT': 'init'
     };
     this.templateSet = { 'init' : htmltemplate };
+
+    $super(options);
   }
 });
 
@@ -14,12 +15,14 @@ var alertView = new AlertView()
 
 var AlertAdapter = _.inherit(Dalmatian.Adapter, {
   initialize: function ($super, options) {
-    $super(options);
+
     this.datamodel = {
       content: '请输入文本',
       confirm: '确定',
       cancel: '取消'
     };
+
+    $super(options);
   },
   setContent: function (content) {
     this.datamodel.content = content;
@@ -29,7 +32,7 @@ var AlertAdapter = _.inherit(Dalmatian.Adapter, {
 
 var alertAdapter = new AlertAdapter();
 
-var Controller = _.inherit(Dalmatian.ViewController, {
+var AlertController = _.inherit(Dalmatian.ViewController, {
   //设置默认信息
   initialize: function ($super, options) {
 
@@ -69,8 +72,8 @@ var Controller = _.inherit(Dalmatian.ViewController, {
 
 });
 
-var controller = new Controller();
-controller.show();
+var alertController = new AlertController();
+alertController.show();
 
 
 describe('MVC initialization:', function() {
@@ -103,5 +106,25 @@ describe('MVC initialization:', function() {
     it('adapter has initialized datamodel', function(){
       assert(typeof alertAdapter.datamodel === 'object');
     })
-  })
+  });
+
+  describe('AlertController inherit from Dalmatian.ViewController', function(){
+
+    it('controller should inherit from Dalmatian.ViewController', function(){
+      assert(alertController instanceof Dalmatian.ViewController);
+    });
+
+    it('controller set view to container', function(){
+      assert($('.container section').html() === alertController.$el.html())
+    });
+
+    it('controller is able to change the content of view', function(){
+
+      var content = 'this is changed information';
+      alertController.setContent(content);
+
+      assert($('.cui-error-tips').text() === content);
+    })
+
+  });
 })
