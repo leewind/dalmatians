@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <title>test for underscore-extend.js</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./asserts/mocha.css" />
+    <script src="./asserts/chai.js"></script>
+    <script src="./asserts/mocha.js"></script>
+    <script>mocha.setup('bdd')</script>
+    <script>
+      function assert(expr, msg) {
+        if (!expr) throw new Error(msg || 'failed');
+      }
+    </script>
+
+    <script src="../vendor/underscore-min.js"></script>
+    <script src="../src/underscore-extend.js"></script>
+    <script src="./case/test-underscore-extend.js"></script>
+    <script>
+      onload = function(){
+        mocha.checkLeaks();
+        mocha.globals(['foo']);
+        var runner = mocha.run();
+      };
+    </script>
+  </head>
+  <body>
+    <div id="mocha"></div>
+  </body>
+</html>
