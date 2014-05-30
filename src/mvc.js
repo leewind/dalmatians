@@ -63,9 +63,9 @@ Dalmatian.View = _.inherit({
       var templateFn = Dalmatian.template(templateSelected);
       this.html = templateFn(data);
 
-      //这里减少一次js编译
-//      this.root.html('');
-//      this.root.append(this.html);
+      // 这里减少一次js编译
+      // this.root.html('');
+      // this.root.append(this.html);
 
       this.currentStatus = status;
 
