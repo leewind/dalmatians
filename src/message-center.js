@@ -23,6 +23,8 @@ Dalmatian.MessageBox = _.inherit({
 
   _verify: function(options) {
     if (!_.property('center')(options)) throw Error('MessageBox必須知道MessageCenter');
+
+    if (!_.property('namespace')(options)) throw Error('MessageBox必須有自己的namspace');
   },
 
   handleOptions: function(options) {
@@ -83,7 +85,7 @@ Dalmatian.MessageCenter = _.inherit({
         return group.namespace === namespace;
       });
 
-      var targets = targetspace;
+      var targets = targetspace[0];
 
       if (messageboxid) {
         targets = _.filter(targetspace.member, function(member) {
@@ -92,7 +94,9 @@ Dalmatian.MessageCenter = _.inherit({
       }
 
       _.each(targets.members, function(member) {
-        member.onReceived(message);
+        if (_.isFunction(member.onReceived)) {
+          member.onReceived(message);
+        }
       });
     }
 
@@ -104,7 +108,7 @@ Dalmatian.MessageCenter = _.inherit({
     });
 
     if (!existgroup || existgroup.length === 0) {
-      var messagegroup = new MessageGroup({
+      var messagegroup = new Dalmatian.MessageGroup({
         namespace: messagebox.namespace
       });
 
@@ -140,9 +144,9 @@ Dalmatian.MessageCenter = _.inherit({
   }
 });
 
-Dalmatian.MessageGroup.getInstance = function() {
+Dalmatian.MessageCenter.getInstance = function() {
   if (!this.instance) {
-    this.instance = new Dalmatian.MessageGroup();
+    this.instance = new Dalmatian.MessageCenter();
   }
 
   return this.instance;

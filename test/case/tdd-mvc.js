@@ -45,7 +45,7 @@ suite('Dalmatian.View', function() {
 
     test('render view according to status and data', function() {
 
-    })
+    });
   })
 
 

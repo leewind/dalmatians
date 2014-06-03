@@ -36,7 +36,7 @@ Dalmatian.AjaxCommunicator = _.inherit(Dalmatian.AbstractCommunicator, {
   },
 
   _setOptions: function(optiions) {
-    var emptyfn = function() {};
+    var occupied = function() {};
     return {
       type: options.type,
       data: options.param,
@@ -45,10 +45,10 @@ Dalmatian.AjaxCommunicator = _.inherit(Dalmatian.AbstractCommunicator, {
       timeout: this._select('timeout', options),
       context: this._select('context', options),
       dataType: this._select('dataType', options),
-      success: options.success || emptyfn,
-      error: options.error || emptyfn,
-      beforeSend: options.beforeSend || emptyfn,
-      complete: options.complete || emptyfn
+      success: options.success || occupied,
+      error: options.error || occupied,
+      beforeSend: options.beforeSend || occupied,
+      complete: options.complete || occupied
     };
   },
 

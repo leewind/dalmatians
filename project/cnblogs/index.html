@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>cnBlogs Web Application</title>
+  <link rel="stylesheet" type="text/css" href="./asserts/styles/widget.css">
+</head>
+<body>
+  <article class="container">
+    <ul class="hotlist"></ul>
+    <div class="content"></div>
+  </article>
+
+  <script type="text/underscore-template" id="template-listview">
+  <% _.each(hotposts, function(item) { %>
+    <li data-id="<%= item.id %>">
+      <div>
+        <span class="title"><%= item.title %></span>
+        <a class="author" href="<%= item.author.uri %>" target="_blank"><%= item.author.name %></a>
+      </div>
+      <div class="summary"><%= item.summary%></div>
+    </li>
+  <% }); %>
+  </script>
+
+  <script type="text/javascript" src="../../vendor/underscore-min.js"></script>
+  <script type="text/javascript" src="../../vendor/zepto.js"></script>
+  <script type="text/javascript" src="../../src/underscore-extend.js" ></script>
+  <script type="text/javascript" src="../../src/mvc.js"></script>
+  <script type="text/javascript" src="../../src/message-center.js"></script>
+  <script type="text/javascript" src="./asserts/scripts/cnblogs.client.js"></script>
+
+</body>
+</html>
