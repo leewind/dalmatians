@@ -261,6 +261,16 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
+   * [_show description]
+   * 私有方法，将dom黏贴到document上去，并且设置页面为显示
+   */
+  _show: function () {
+    this.bindEvents();
+    $(this.container).append(this.$el);
+    this.$el.show();
+  },
+
+  /**
    * [handleOptions description]
    * 操作构造函数传入参数，将其绑定在实例对象上
    *
@@ -295,6 +305,17 @@ Dalmatian.ViewController = _.inherit({
     this.create();
   },
 
+  /**
+   * [render description]
+   * 可以被复写，调用view的render方法去渲染具体的view
+   */
+  render: function () {
+    if (_.isObject(this.view)) {
+      this.view.render(this.viewstatus, this.adapter && this.adapter.getViewModel());
+      this.view.root.html(this.view.html);
+    }
+  },
+
   // @deprecated
   // 直接设置viewstatus的值就可以了，这个接口很多余
   // setViewStatus: function (status) {
@@ -302,6 +323,7 @@ Dalmatian.ViewController = _.inherit({
   // },
 
   // @description 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话，直接调用render方法重绘
+  // @notation 这个方法需要重构
   update: function (data) {
 
     //    _.callmethod(this.hide, this);
@@ -317,30 +339,21 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
-  * @override
-  */
-  render: function () {
-    // @notation  这个方法需要被复写
-
-    if (_.isObject(this.view)) {
-      this.view.render(this.viewstatus, this.adapter && this.adapter.getViewModel());
-      this.view.root.html(this.view.html);
-    }
+   * [create description]
+   * 生命周期create，提供了两个回调onViewBeforeCreate和onViewAfterCreate，
+   * 分别在create之前和之后执行
+   */
+  create: function () {
+    // 在create方法调用前后设置onViewBeforeCreate和onViewAfterCreate两个回调
+    _.wrapmethod(this._create, 'onViewBeforeCreate', 'onViewAfterCreate', this);
   },
 
-
-
-  create: function () {
-
-    //l_wang这块不是很明白
-    //是否检查映射关系，不存在则recreate，但是在这里dom结构未必在document上
-    //    if (!$('#' + this.view.viewid)[0]) {
-    //      return _.callmethod(this.recreate, this);
-    //    }
-
-    // @notation 在create方法调用前后设置onViewBeforeCreate和onViewAfterCreate两个回调
-    _.wrapmethod(this._create, 'onViewBeforeCreate', 'onViewAfterCreate', this);
-
+  /**
+   * [show description]
+   * 生命周期show，提供了两个回调onViewBeforeShow和onViewAfterShow，
+   */
+  show: function () {
+    _.wrapmethod(this._show, 'onViewBeforeShow', 'onViewAfterShow', this);
   },
 
   /**
@@ -390,16 +403,6 @@ Dalmatian.ViewController = _.inherit({
   unBindEvents: function () {
     this.$el.off('.delegateEvents' + this.view.viewid);
     return this;
-  },
-
-  _show: function () {
-    this.bindEvents();
-    $(this.container).append(this.$el);
-    this.$el.show();
-  },
-
-  show: function () {
-    _.wrapmethod(this._show, 'onViewBeforeShow', 'onViewAfterShow', this);
   },
 
   _hide: function () {

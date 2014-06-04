@@ -216,4 +216,40 @@ suite('Dalmatian.ViewController', function() {
       assert(alertController.view.html === 'hello')
     });
   });
-})
+
+  suite('#create()', function() {
+    var alertAdapter = new AlertAdapter({
+      datamodel: {data: 'hello'}
+    });
+    var alertView = new AlertView();
+
+    test('should execute onViewBeforeCreate before create and execute onViewAfterCreate after create', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        onViewBeforeCreate: function() {
+          this.beforedata = 1
+          assert(typeof this.afterdata === 'undefined');
+        },
+        onViewAfterCreate: function() {
+          this.afterdata = 2;
+          assert(this.afterdata > this.beforedata);
+        }
+      });
+    });
+
+    test('should render view', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+      });
+      assert(alertController.view.html === 'hello')
+    })
+  });
+
+  suite('#show()', function() {
+
+  });
+});
