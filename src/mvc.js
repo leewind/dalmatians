@@ -211,24 +211,83 @@ Dalmatian.Adapter = _.inherit({
 
 Dalmatian.ViewController = _.inherit({
 
+  /**
+   * [_initialize description]
+   * 私有方法，创建不可重复的controllerid
+   */
   _initialize: function () {
-
-    //用户设置的容器选择器，或者dom结构
-    this.container;
-    //根元素
-    this.$el;
-
-    //一定会出现
-    this.view;
-    //可能会出现
-    this.adapter;
-    //初始化的时候便需要设置view的状态，否则会渲染失败，这里给一个默认值
-    this.viewstatus = 'init';
-
     this.controllerid = _.uniqueId('dalmatian-controller-');
   },
 
-  // @description 构造函数入口
+  /**
+   * [_handleAdapter description]
+   * 处理dataAdpter中的datamodel，为其注入view的默认容器数据
+   */
+  _handleAdapter: function () {
+    if (this.adapter) {
+      this.adapter.registerObserver(this);
+    }
+  },
+
+  /**
+   * [_verify description]
+   * 验证用户是不是提供了必要的参数
+   *
+   * @param  {[object]} options [用户自定义传入的参数]
+   */
+  _verify: function (options) {
+
+    // underscore 1.6版本提供_.property接口
+    if (!_.property('view')(options) && (!this.view))
+      throw Error('view必须在实例化的时候传入ViewController');
+
+    if (!_.property('viewstatus')(options) && (!this.viewstatus))
+      throw Error('ViewController初始化时必须获得viewstatus值');
+  },
+
+  /**
+   * [_create description]
+   * 私有方法，创建根元素的dom结构
+   *
+   * @return {[type]} [description]
+   */
+  _create: function () {
+    this.render();
+
+    //render结束后构建根元素dom结构
+    if (_.isObject(this.view)){
+      this.$el = this.view.root;
+    }
+  },
+
+  /**
+   * [handleOptions description]
+   * 操作构造函数传入参数，将其绑定在实例对象上
+   *
+   * @param  {[object]} options [用户自定义传入的参数]
+   */
+  handleOptions: function (options) {
+    if (options) {
+      this._verify(options);
+
+      // 从形参中获取key和value绑定在this上
+      if (_.isObject(options))
+        _.extend(this, options);
+    };
+  },
+
+  /**
+   * [initialize description]
+   * 初始化ViewController，建立controllerid，设置adapter作为controller的被观察者
+   * 传入的一些参数：
+   * 1. container 用户设置的容器选择器或者dom结构，可选
+   * 2. view ViewController管理的view，必须
+   * 3. adapter 渲染view需要的适配器，可选
+   * 4. viewstatus 初始化view的状态值定义，必须
+   * controller创建$el元素
+   *
+   * @param  {[object]} options [用户自定义传入的参数]
+   */
   initialize: function (options) {
     this._initialize();
     this.handleOptions(options);
@@ -236,32 +295,11 @@ Dalmatian.ViewController = _.inherit({
     this.create();
   },
 
-  //处理dataAdpter中的datamodel，为其注入view的默认容器数据
-  _handleAdapter: function () {
-    if (this.adapter) {
-      this.adapter.registerObserver(this);
-    }
-  },
-
-  // @description 操作构造函数传入操作
-  handleOptions: function (options) {
-    if (!options) return;
-
-    this._verify(options);
-
-    // @description 从形参中获取key和value绑定在this上
-    if (_.isObject(options)) _.extend(this, options);
-  },
-
-  setViewStatus: function (status) {
-    this.viewstatus = status;
-  },
-
-  // @description 验证参数
-  _verify: function (options) {
-    // underscore 1.6版本提供_.property接口
-    if (!_.property('view')(options) && (!this.view)) throw Error('view必须在实例化的时候传入ViewController');
-  },
+  // @deprecated
+  // 直接设置viewstatus的值就可以了，这个接口很多余
+  // setViewStatus: function (status) {
+  //   this.viewstatus = status;
+  // },
 
   // @description 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话，直接调用render方法重绘
   update: function (data) {
@@ -272,6 +310,7 @@ Dalmatian.ViewController = _.inherit({
       _.callmethod(this.onViewUpdate, this, [data]);
       return;
     }
+
     this.render();
 
     //    _.callmethod(this.show, this);
@@ -289,17 +328,7 @@ Dalmatian.ViewController = _.inherit({
     }
   },
 
-  _create: function () {
-    this.render();
 
-    //render 结束后构建好根元素dom结构
-
-    if (_.isObject(this.view)){
-      this.view.root.html(this.view.html);
-      this.$el = this.view.root;
-    }
-
-  },
 
   create: function () {
 

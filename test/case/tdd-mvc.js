@@ -156,8 +156,10 @@ suite('Dalmatian.Adapter', function() {
       var alertAdapter = new AlertAdapter({
         datamodel: {data: 'hello'}
       });
+      var alertView = new AlertView();
       var controller_origin = new Dalmatian.ViewController({
-        view: new AlertView(),
+        view: alertView,
+        viewstatus: alertView.statusSet['INIT'],
         onViewUpdate: function() {
           assert(true)
         }
@@ -177,11 +179,13 @@ suite('Dalmatian.ViewController', function() {
       var alertAdapter = new AlertAdapter({
         datamodel: {data: 'hello'}
       });
+      var alertView = new AlertView();
 
       var name = 'tdd-test'
       var alertController = new AlertController({
-        view: new AlertView(),
+        view: alertView,
         adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
         name: name
       });
 
@@ -194,15 +198,22 @@ suite('Dalmatian.ViewController', function() {
       datamodel: {data: 'hello'}
     });
 
-    var name = 'tdd-test'
+    var alertView = new AlertView();
+
+    var name = 'tdd-test';
     var alertController = new AlertController({
-      view: new AlertView(),
+      view: alertView,
       adapter: alertAdapter,
+      viewstatus: alertView.statusSet['INIT'],
       name: name
     });
 
-    test('', function() {
+    test('should initialize controllerid', function() {
+      assert(alertController.controllerid !== 'undefined')
+    });
 
-    })
-  })
+    test('should create view.root and view.html', function() {
+      assert(alertController.view.html === 'hello')
+    });
+  });
 })
