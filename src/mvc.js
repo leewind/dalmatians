@@ -70,9 +70,13 @@ Dalmatian.View = _.inherit({
     var templateSelected = this.templateSet[status];
     if (templateSelected) {
 
-      // @description 渲染view
-      var templateFn = Dalmatian.template(templateSelected);
-      this.html = templateFn(data);
+      if (data) {
+        // 渲染view
+        var templateFn = Dalmatian.template(templateSelected);
+        this.html = templateFn(data);
+      }else{
+        this.html = templateSelected
+      }
 
       this.currentStatus = status;
 
@@ -234,9 +238,9 @@ Dalmatian.ViewController = _.inherit({
 
   //处理dataAdpter中的datamodel，为其注入view的默认容器数据
   _handleAdapter: function () {
-    //不存在就不予理睬
-    if (!this.adapter) return;
-    this.adapter.registerObserver(this);
+    if (this.adapter) {
+      this.adapter.registerObserver(this);
+    }
   },
 
   // @description 操作构造函数传入操作
@@ -255,9 +259,8 @@ Dalmatian.ViewController = _.inherit({
 
   // @description 验证参数
   _verify: function (options) {
-    //这个underscore方法新框架在报错
-    //    if (!_.property('view')(options) && (!this.view)) throw Error('view必须在实例化的时候传入ViewController');
-    if (options.view && (!this.view)) throw Error('view必须在实例化的时候传入ViewController');
+    // underscore 1.6版本提供_.property接口
+    if (!_.property('view')(options) && (!this.view)) throw Error('view必须在实例化的时候传入ViewController');
   },
 
   // @description 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话，直接调用render方法重绘

@@ -72,7 +72,6 @@ suite('Dalmatian.View', function() {
       assert(alertView.html === updateText);
     });
   });
-
 });
 
 var AlertAdapter = _.inherit(Dalmatian.Adapter, {});
@@ -154,8 +153,11 @@ suite('Dalmatian.Adapter', function() {
 
   suite('#notifyDataChanged()', function() {
     test('when data changed controller should notify', function() {
-      var alertAdapter = new AlertAdapter();
+      var alertAdapter = new AlertAdapter({
+        datamodel: {data: 'hello'}
+      });
       var controller_origin = new Dalmatian.ViewController({
+        view: new AlertView(),
         onViewUpdate: function() {
           assert(true)
         }
@@ -163,6 +165,44 @@ suite('Dalmatian.Adapter', function() {
 
       alertAdapter.registerObserver(controller_origin);
       alertAdapter.notifyDataChanged();
+    })
+  })
+});
+
+var AlertController = _.inherit(Dalmatian.ViewController, {});
+
+suite('Dalmatian.ViewController', function() {
+  suite('#handleOptions(options)', function() {
+    test('should transfer options to object properties', function() {
+      var alertAdapter = new AlertAdapter({
+        datamodel: {data: 'hello'}
+      });
+
+      var name = 'tdd-test'
+      var alertController = new AlertController({
+        view: new AlertView(),
+        adapter: alertAdapter,
+        name: name
+      });
+
+      assert(alertController.name === name);
+    });
+  });
+
+  suite('#initialize(options)', function() {
+    var alertAdapter = new AlertAdapter({
+      datamodel: {data: 'hello'}
+    });
+
+    var name = 'tdd-test'
+    var alertController = new AlertController({
+      view: new AlertView(),
+      adapter: alertAdapter,
+      name: name
+    });
+
+    test('', function() {
+
     })
   })
 })
