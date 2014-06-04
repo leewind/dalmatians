@@ -1,11 +1,15 @@
-var htmltemplate = $('#template-alert').html();
-
 var AlertView = _.inherit(Dalmatian.View, {
   initialize: function ($super, options) {
+
     this.statusSet = {
-      'INIT': 'init'
+      'INIT': 'init',
+      'PROCESSING': 'processing'
     };
-    this.templateSet = { 'init' : htmltemplate };
+
+    this.templateSet = {
+      'init' : '<%=data%>',
+      'processing': '<%=name%>',
+    };
 
     $super(options);
   }
@@ -28,6 +32,7 @@ suite('Dalmatian.View', function() {
     });
   });
 
+  // @description test for api:initialize()
   suite('#initialize()', function() {
     var alertView = new AlertView();
 
@@ -41,12 +46,32 @@ suite('Dalmatian.View', function() {
     });
   });
 
+  // @description test for api:render(status, data, callback)
   suite('#render(status, data, callback)', function() {
-
+    var alertView = new AlertView();
     test('render view according to status and data', function() {
+      var text = 'hello world';
 
+      alertView.render(alertView.statusSet['INIT'], {data: text}, function() {
+        assert(alertView.html === text);
+      });
     });
-  })
+  });
+
+  // @description test for api:update(status, data)
+  suite('#update(status, data)', function() {
+    var alertView = new AlertView();
+
+    test('update view according to status and data changed', function() {
+      var text = 'hello world';
+      var updateText = 'update hello world';
+
+      alertView.render(alertView.statusSet['INIT'], {data: text}, function() {});
+      alertView.update(alertView.statusSet['PROCESSING'], {name: updateText});
+
+      assert(alertView.html === updateText);
+    });
+  });
 
 
 });

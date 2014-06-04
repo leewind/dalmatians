@@ -8,14 +8,6 @@ var Dalmatian = Dalmatian || {};
 // @description 定义默认的template方法来自于underscore
 Dalmatian.template = _.template;
 Dalmatian.View = _.inherit({
-  // @description 构造函数入口
-  initialize: function (options) {
-    this._initialize();
-    this.handleOptions(options);
-    this._initRoot();
-
-  },
-
   _initRoot: function () {
     //根据html生成的dom包装对象
     //有一种场景是用户的view本身就是一个只有一个包裹器的结构，他不想要多余的包裹器
@@ -40,6 +32,14 @@ Dalmatian.View = _.inherit({
     // this.templateSet = {};
 
     this.viewid = _.uniqueId('dalmatian-view-');
+
+  },
+
+  // @description 构造函数入口
+  initialize: function (options) {
+    this._initialize();
+    this.handleOptions(options);
+    this._initRoot();
 
   },
 
