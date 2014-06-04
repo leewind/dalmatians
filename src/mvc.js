@@ -106,58 +106,97 @@ Dalmatian.View = _.inherit({
 
 Dalmatian.Adapter = _.inherit({
 
-  // @description 构造函数入口
-  initialize: function (options) {
-    this._initialize();
-    this.handleOptions(options);
-
-  },
-
-  // @description 设置默认属性
+  /**
+   * [_initialize description]
+   * 私有方法，设置默认属性
+   */
   _initialize: function () {
     this.observers = [];
-    //    this.viewmodel = {};
     this.datamodel = {};
   },
 
-  // @description 操作构造函数传入操作
+  /**
+   * [initialize description]
+   * 构造函数入口
+   *
+   * @param  {[object]} options [用户自定义传入的参数]
+   */
+  initialize: function (options) {
+    this._initialize();
+    this.handleOptions(options);
+  },
+
+  /**
+   * [handleOptions description]
+   * 操作构造函数传入参数，将其绑定在实例对象上
+   *
+   * @param  {[object]} options [用户自定义传入的参数]
+   */
   handleOptions: function (options) {
-    // @description 从形参中获取key和value绑定在this上
+
+    // 从形参中获取key和value绑定在this上
     if (_.isObject(options)) _.extend(this, options);
   },
 
-  // @override
-  // @description 设置
-  format: function (datamodel) {
-    return datamodel;
+  /**
+   * [format description]
+   * 需要被重写，format方法承载两个作用
+   * 1. 将datamodel格式化到viewmodel，格式化的规则由用户自定义
+   * 2. 对datamodel和viewmodel赋值
+   *
+   * @param  {[object]} data [需要格式化的数据]
+   * @return {[object]}      [viewmodel]
+   */
+  format: function (data) {
+    this.datamodel = this.viewmodel = data;
+    return this.viewmodel;
   },
 
+  /**
+   * [getViewModel description]
+   * 调用format方法，格式化datamodel到viewmodel
+   *
+   * @return {[object]} [viewmodel]
+   */
   getViewModel: function () {
     return this.format(this.datamodel);
   },
 
+  /**
+   * [registerObserver description]
+   * 向观察者队列中添加新的观察者
+   *
+   * @param  {[ViewController]} viewcontroller [新的观察者]
+   */
   registerObserver: function (viewcontroller) {
-    // @description 检查队列中如果没有viewcontroller，从队列尾部推入
-    if (!_.contains(this.observers, viewcontroller)) {
+    // 检查队列中如果没有重复的viewcontroller，从队列尾部推入
+    var arr = _.where(this.observers, viewcontroller);
+    if (arr.length === 0) {
       this.observers.push(viewcontroller);
     }
   },
 
+  /**
+   * [unregisterObserver description]
+   * 从观察者队列中剔除特定的观察者
+   *
+   * @param  {[ViewController]} viewcontroller [特定的需要剔除的观察者]
+   */
   unregisterObserver: function (viewcontroller) {
-    // @description 从observers的队列中剔除viewcontroller
-    this.observers = _.without(this.observers, viewcontroller);
+    // 从observers的队列中剔除viewcontroller
+    this.observers = _.filter(this.observers, function(item) {
+      return item.controllerid !== viewcontroller.controllerid;
+    });
   },
 
-  //统一设置所有观察者的状态，因为对应观察者也许根本不具备相关状态，所以这里需要处理
-//  setStatus: function (status) {
-//    _.each(this.observers, function (viewcontroller) {
-//      if (_.isObject(viewcontroller))
-//        viewcontroller.setViewStatus(status);
-//    });
-//  },
-
+  /**
+   * [notifyDataChanged description]
+   * 通知观察者队列中所有观察者，数据发生变化，调用观察者update接口
+   *
+   * @return {[type]} [description]
+   */
   notifyDataChanged: function () {
-    // @description 通知所有注册的观察者被观察者的数据发生变化
+    // 通知所有注册的观察者被观察者的数据发生变化
     var data = this.getViewModel();
     _.each(this.observers, function (viewcontroller) {
       if (_.isObject(viewcontroller))
@@ -182,6 +221,7 @@ Dalmatian.ViewController = _.inherit({
     //初始化的时候便需要设置view的状态，否则会渲染失败，这里给一个默认值
     this.viewstatus = 'init';
 
+    this.controllerid = _.uniqueId('dalmatian-controller-');
   },
 
   // @description 构造函数入口
@@ -239,16 +279,23 @@ Dalmatian.ViewController = _.inherit({
   */
   render: function () {
     // @notation  这个方法需要被复写
-    this.view.render(this.viewstatus, this.adapter && this.adapter.getViewModel());
-    this.view.root.html(this.view.html);
+
+    if (_.isObject(this.view)) {
+      this.view.render(this.viewstatus, this.adapter && this.adapter.getViewModel());
+      this.view.root.html(this.view.html);
+    }
   },
 
   _create: function () {
     this.render();
 
     //render 结束后构建好根元素dom结构
-    this.view.root.html(this.view.html);
-    this.$el = this.view.root;
+
+    if (_.isObject(this.view)){
+      this.view.root.html(this.view.html);
+      this.$el = this.view.root;
+    }
+
   },
 
   create: function () {
