@@ -1,59 +1,70 @@
 "use strict";
 
-// ------------------华丽的分割线--------------------- //
-
 // @description 正式的声明Dalmatian框架的命名空间
 var Dalmatian = Dalmatian || {};
 
 // @description 定义默认的template方法来自于underscore
 Dalmatian.template = _.template;
+
 Dalmatian.View = _.inherit({
+
+  /**
+   * [_initRoot description]
+   * 私有方法，根据html生成的dom包装对象
+   */
   _initRoot: function () {
-    //根据html生成的dom包装对象
-    //有一种场景是用户的view本身就是一个只有一个包裹器的结构，他不想要多余的包裹器
     this.root = $(this.defaultContainerTemplate);
     this.root.attr('id', this.viewid);
   },
 
-  // @description 设置默认属性
+  /**
+   * [_initialize description]
+   * 私有方法，设置默认属性
+   */
   _initialize: function () {
 
     var DEFAULT_CONTAINER_TEMPLATE = '<section class="view" id="<%=viewid%>"><%=html%></section>';
-
-    // @description view状态机
-    // this.statusSet = {};
-
     this.defaultContainerTemplate = DEFAULT_CONTAINER_TEMPLATE;
 
-    // @override
-    // @description template集合，根据status做template的map
-    // @example
-    //    { 0: '<ul><%_.each(list, function(item){%><li><%=item.name%></li><%});%></ul>' }
-    // this.templateSet = {};
-
     this.viewid = _.uniqueId('dalmatian-view-');
-
   },
 
-  // @description 构造函数入口
+  /**
+   * [initialize description]
+   * 构造函数入口，执行实例化时必定会执行initialize方法，
+   * 所有初始化的动作，都需要在这里被执行
+   * 有两个字段必须被定义，statusSet和templateSet，
+   * 用户可以在构造函数执行时传入，也可以在复写initialize时定义
+   * 这里的目标是用status做template的map，即status代表了template的映射关系
+   *
+   * @param  {[object]} options [用户自定义传入的参数]
+   */
   initialize: function (options) {
     this._initialize();
     this.handleOptions(options);
     this._initRoot();
-
   },
 
-  // @description 操作构造函数传入操作
+  /**
+   * [handleOptions description]
+   * 操作构造函数传入参数，将其绑定在实例对象上
+   *
+   * @param  {[object]} options [用户自定义传入的参数]
+   */
   handleOptions: function (options) {
-    // @description 从形参中获取key和value绑定在this上
+    // 从形参中获取key和value绑定在this上
     if (_.isObject(options)) _.extend(this, options);
 
   },
 
-  // @description 通过模板和数据渲染具体的View
-  // @param status {enum} View的状态参数
-  // @param data {object} 匹配View的数据格式的具体数据
-  // @param callback {functiion} 执行完成之后的回调
+  /**
+   * [render description]
+   * 根据status的值找到具体的template，加载数据渲染具体的view
+   *
+   * @param  {[enum]}     status    [View的状态参数]
+   * @param  {[object]}   data      [匹配View的数据格式的具体数据]
+   * @param  {Function}   callback  [执行完成之后的回调]
+   */
   render: function (status, data, callback) {
 
     var templateSelected = this.templateSet[status];
@@ -63,32 +74,32 @@ Dalmatian.View = _.inherit({
       var templateFn = Dalmatian.template(templateSelected);
       this.html = templateFn(data);
 
-      // 这里减少一次js编译
-      // this.root.html('');
-      // this.root.append(this.html);
-
       this.currentStatus = status;
 
       _.callmethod(callback, this);
 
       return this.html;
-
     }
   },
 
-  // @override
-  // @description 可以被复写，当status和data分别发生变化时候
-  // @param status {enum} view的状态值
-  // @param data {object} viewmodel的数据
+  /**
+   * [update description]
+   * 根据view的status变化判断是不是需要重新render，
+   * 如果不需要重新render，调用完成之后回调onUpdate方法，
+   * onUpdate需要被定义在回调过程中可以使用，用来作为对DOM操作的补充
+   *
+   * @param  {[enum]} status [view的状态值]
+   * @param  {[type]} data   [viewmodel的数据]
+   */
   update: function (status, data) {
 
     if (!this.currentStatus || this.currentStatus !== status) {
       return this.render(status, data);
     }
 
-    // @override
-    // @description 可复写部分，当数据发生变化但是状态没有发生变化时，页面仅仅变化的可以是局部显示
-    //              可以通过获取this.html进行修改
+    // onUpdate是可复写和自定义的部分，当数据发生变化但是状态没有发生变化时，
+    // 页面仅仅变化的可以是局部显示，可以通过获取this.html进行修改，
+    // 可以使render的操作也可以使对dom的操作
     _.callmethod(this.onUpdate, this, data);
   }
 });
