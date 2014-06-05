@@ -31,8 +31,9 @@
         </div>
       </div>
   </script>
-  <script type="text/javascript" src="../../vendor/underscore.js"></script>
-  <script type="text/javascript" src="../../vendor/zepto.js"></script>
+   <script src="../../vendor/zepto.min.js" type="text/javascript"></script>
+  <script src="../../vendor/underscore-min.js" type="text/javascript"></script>
+
   <script src="../../src/underscore-extend.js" type="text/javascript"></script>
   <script src="../../src/mvc.js" type="text/javascript"></script>
   <script type="text/javascript" >
@@ -69,6 +70,7 @@
         this.view = new AlertView();
         this.adapter = new Adapter();
         this.container = '.container';
+        this.viewstatus = 'init';
 
       },
 

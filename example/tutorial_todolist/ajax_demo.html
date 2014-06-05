@@ -139,10 +139,11 @@ var AjaxViewController = _.inherit(Dalmatian.ViewController, {
   },
 
   _handleAjax: function (data) {
-    this.setViewStatus('loading');
+    this.viewstatus = 'loading';
     this.adapter.ajaxLoading();
     getAjaxData($.proxy(function (data) {
-      this.setViewStatus('ajaxSuc');
+      this.viewstatus = 'ajaxSuc';
+
       this.adapter.ajaxSuc(data);
     }, this), data);
   },
