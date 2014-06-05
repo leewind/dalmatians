@@ -195,7 +195,7 @@ var Application = _.inherit({
 
     //解析viewId逻辑暂时省略
     //......
-    this.switchView(viewId);
+    this.switchView();
 
     setTimeout($.proxy(function () {
       this.startListeningRoute();
@@ -221,15 +221,14 @@ var Application = _.inherit({
   },
 
   //view切换，传入要显示和隐藏的view实例
-  switchView: function (viewId) {
+  switchView: function () {
     //处理view前，得先处理当前request对象，这里传入只是一个id，我们得解析出request对象
     this.parseUrl();
-    viewId = this.request.viewId;
 
     //若是要切换的view就是当前view视为刷新操作
     //
 
-    this.loadView(viewId, function (view) {
+    this.loadView(this.request.viewId, function (view) {
       this.lastView = this.curView;
       this.curView = view;
 
