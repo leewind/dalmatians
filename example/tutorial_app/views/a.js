@@ -11,7 +11,6 @@ define([], function () {
     hide: function () {
       console.log('view a hide');
     }
-
   };
 
   return View;
