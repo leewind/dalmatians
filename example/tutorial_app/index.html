@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>example</title>
+</head>
+<body>
+ 
+  <script src="../../vendor/require.js" type="text/javascript"></script>
+  <script src="../../vendor/zepto.js" type="text/javascript"></script>
+  <script src="../../vendor/underscore.js" type="text/javascript"></script>
+  <script src="../../src/underscore-extend.js" type="text/javascript"></script>
+
+  <script src="../../src/abstract_app.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+
+//    require.config({
+//      baseUrl: '',
+//      path: {
+//        a: 'views/a'
+//      }
+//    });
+
+    var app = new Application({
+      
+    });
+
+    setTimeout(function () {
+      app.forward('a&from=http://www.baidu.com');
+    }, 1000);
+
+    setTimeout(function () {
+      app.back();
+    }, 3000);
+
+    var s = '';
+
+  
+  </script>
+
+
+
+</body>
+</html>
+
