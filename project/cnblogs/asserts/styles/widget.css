@@ -1,0 +1,11 @@
+ul,li{list-style: none; padding: 0; margin: 0;}
+
+
+.hotlist{ font: 12px/20px monospace,arial,sans-serif;}
+ul.hotlist{width: 30%; height: 100%; float: left;}
+.hotlist li{padding: 10px;}
+.hotlist span.title{font: bold 16px/20px monospace,arial,sans-serif;}
+.hotlist div.summary{color: #aaa;}
+
+.content{float: left;width: 70%;height: 100%;}
+
