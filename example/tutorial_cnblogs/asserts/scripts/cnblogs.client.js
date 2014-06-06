@@ -21,12 +21,9 @@ var ListAdapter = _.inherit(Dalmatian.Adapter, {
     var scope = this;
     if (this.datamodel && this.datamodel.feed) {
       _.each(this.datamodel.feed.entry, function(item) {
-        // console.log(item)
         scope.viewmodel.hotposts.push(item)
       });
     };
-
-    console.log(this.viewmodel)
 
     return this.viewmodel;
   }
@@ -52,7 +49,6 @@ var ListController = _.inherit(Dalmatian.ViewController, {
 
   render: function () {
     var html = this.view.render(this.viewstatus, this.adapter.getViewModel());
-    console.log(html)
     this.view.root.html(this.view.html);
   },
 
@@ -77,9 +73,6 @@ var ListController = _.inherit(Dalmatian.ViewController, {
   },
 
   readPost: function(event) {
-    console.log($(event.currentTarget).attr('data-id'));
-
-
     var postid = $(event.currentTarget).attr('data-id');
 
     // var scope = this;

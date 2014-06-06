@@ -62,9 +62,6 @@ Dalmatian.View = _.inherit({
    */
   render: function (status, data, callback) {
 
-    console.log(status);
-    console.log(data)
-
     var templateSelected = this.templateSet[status];
     if (templateSelected) {
 
