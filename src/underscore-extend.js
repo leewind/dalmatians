@@ -1,54 +1,54 @@
 ﻿(function () {
 
   var window = this;
-
   var _ = window._;
-  if (typeof require === 'function') {
-    //    _ = require('underscore');
-  };
 
-  // @description 全局可能用到的变量
+  // 全局可能用到的变量
   var arr = [];
   var slice = arr.slice;
 
   var method = method || {};
 
-
   /**
-  * @description inherit方法，js的继承，默认为两个参数
-  * @param {function} supClass 可选，要继承的类
-  * @param {object} subProperty 被创建类的成员
-  * @return {function} 被创建的类
-  */
-  method.inherit = function () {
+   * inherit方法，js的继承，默认为两个参数
+   *
+   * @param  {function} origin  可选，要继承的类
+   * @param  {object}   methods 被创建类的成员，扩展的方法和属性
+   * @return {function}         继承之后的子类
+   */
+  method.inherit = function (origin, methods) {
 
-    // @description 参数检测，该继承方法，只支持一个参数创建类，或者两个参数继承类
+    // 参数检测，该继承方法，只支持一个参数创建类，或者两个参数继承类
     if (arguments.length === 0 || arguments.length > 2) throw '参数错误';
 
     var parent = null;
 
-    // @description 将参数转换为数组
+    // 将参数转换为数组
     var properties = slice.call(arguments);
 
-    // @description 如果第一个参数为类（function），那么就将之取出
+    // 如果第一个参数为类（function），那么就将之取出
     if (typeof properties[0] === 'function')
       parent = properties.shift();
     properties = properties[0];
 
-    // @description 创建新类用于返回
+    // 创建新类用于返回
     function klass() {
       if (_.isFunction(this.initialize))
         this.initialize.apply(this, arguments);
     }
 
     klass.superclass = parent;
+
+    // 父类的方法不做保留，直接赋给子类
     // parent.subclasses = [];
 
     if (parent) {
-      // @description 中间过渡类，防止parent的构造函数被执行
+      // 中间过渡类，防止parent的构造函数被执行
       var subclass = function () { };
       subclass.prototype = parent.prototype;
       klass.prototype = new subclass();
+
+      // 父类的方法不做保留，直接赋给子类
       // parent.subclasses.push(klass);
     }
 
@@ -96,15 +96,30 @@
     return klass;
   };
 
-  // @description 返回需要的函数
-  method.getNeedFn = function (key, scope) {
+  /**
+   * 验证作用域和map，返回函数指针
+   *
+   * @param  {string}   key   map中的映射对象
+   * @param  {object}   scope 执行作用域
+   * @return {function}       函数指针
+   */
+  method.realize = function(key, scope) {
     scope = scope || window;
     if (_.isFunction(key)) return key;
     if (_.isFunction(scope[key])) return scope[key];
     return function () { };
   };
 
-  method.callmethod = function (method, scope, params) {
+
+  /**
+   * 判断method是不是function，然后在执行作用域中执行方法，类似于call和apply
+   *
+   * @param  {function} method  函数句柄
+   * @param  {object}   scope   执行作用域
+   * @param  {array}    params  参数
+   * @return {unknown}          执行方法返回值
+   */
+  method.execute = function (method, scope, params) {
     scope = scope || this;
     if (_.isFunction(method)) {
       return _.isArray(params) ? method.apply(scope, params) : method.call(scope, params);
@@ -114,196 +129,200 @@
   };
 
   /**
-  * @description 在fn方法的前后通过键值设置两个传入的回调
-  * @param fn {function} 调用的方法
-  * @param beforeFnKey {string} 从context对象中获得的函数指针的键值，该函数在fn前执行
-  * @param afterFnKey {string} 从context对象中获得的函数指针的键值，该函数在fn后执行
-  * @param context {object} 执行环节的上下文
-  * @return {function}
-  */
-  method.wrapmethod = method.insert = function (fn, beforeFnKey, afterFnKey, context) {
+   * 在fn方法的前后通过键值设置两个传入的回调
+   *
+   * @param  {function} fn          调用的方法
+   * @param  {function} beforeFnKey 在fn之前执行的函数
+   * @param  {function} beforeFnKey 在fn之后执行的函数
+   * @param  {object}   context     执行上下文
+   * @return {unknown}              执行函数的返回值
+   */
+  method.pack = method.insert = function (fn, beforeFnKey, afterFnKey, context) {
 
     var scope = context || this;
     var action = _.wrap(fn, function (func) {
 
-      _.callmethod(_.getNeedFn(beforeFnKey, scope), scope);
+      _.execute(_.realize(beforeFnKey, scope), scope);
 
       func.call(scope);
 
-      _.callmethod(_.getNeedFn(afterFnKey, scope), scope);
+      _.execute(_.realize(afterFnKey, scope), scope);
     });
 
-    return _.callmethod(action, scope);
+    return _.execute(action, scope);
   };
 
-  method.Hash = method.inherit({
-    initialize: function (opts) {
-      this.keys = [];
-      this.values = [];
-    },
+  // 确认需要之后再添加
+  //------------------------------------
+  // method.Hash = method.inherit({
+  //   initialize: function (opts) {
+  //     this.keys = [];
+  //     this.values = [];
+  //   },
 
-    length: function () {
-      return this.keys.length;
-    },
+  //   length: function () {
+  //     return this.keys.length;
+  //   },
 
-    /**
-    * @method getItem
-    * @param {string} key 键值名
-    * @description 通过键值名获取对象
-    * @return {string|int|object}
-    */
-    getItem: function (key) {
-      var index = _.indexOf(this.keys, key);
+  //   /**
+  //   * @method getItem
+  //   * @param {string} key 键值名
+  //   * @description 通过键值名获取对象
+  //   * @return {string|int|object}
+  //   */
+  //   getItem: function (key) {
+  //     var index = _.indexOf(this.keys, key);
 
-      if (index < 0) return null;
-      else return this.values[index];
-    },
+  //     if (index < 0) return null;
+  //     else return this.values[index];
+  //   },
 
-    //传入order，若是数组中存在的话会将之放到最后，保证数组的唯一性，因为这个是hash，不能存在重复的键
-    push: function (key, value, order) {
-      if (_.isObject(key)) {
-        for (var i in key) {
-          if (key.hasOwnProperty(i)) this.push(i, key[i], order);
-        }
-        return;
-      }
+  //   //传入order，若是数组中存在的话会将之放到最后，保证数组的唯一性，因为这个是hash，不能存在重复的键
+  //   push: function (key, value, order) {
+  //     if (_.isObject(key)) {
+  //       for (var i in key) {
+  //         if (key.hasOwnProperty(i)) this.push(i, key[i], order);
+  //       }
+  //       return;
+  //     }
 
-      var index = _.indexOf(this.keys, key);
+  //     var index = _.indexOf(this.keys, key);
 
-      if (index != -1 && !order) {
-        this.values[index] = value;
-      } else {
-        if (order) this.remove(key);
-        this.keys.push(key);
-        this.values.push(value);
-      }
+  //     if (index != -1 && !order) {
+  //       this.values[index] = value;
+  //     } else {
+  //       if (order) this.remove(key);
+  //       this.keys.push(key);
+  //       this.values.push(value);
+  //     }
 
-    },
+  //   },
 
-    remove: function (key) {
-      return this.removeByIndex(_.indexOf(this.keys, key));
-    },
+  //   remove: function (key) {
+  //     return this.removeByIndex(_.indexOf(this.keys, key));
+  //   },
 
-    removeByIndex: function (index) {
-      if (index == -1) return this;
+  //   removeByIndex: function (index) {
+  //     if (index == -1) return this;
 
-      this.keys.splice(index, 1);
-      this.values.splice(index, 1);
+  //     this.keys.splice(index, 1);
+  //     this.values.splice(index, 1);
 
-      return this;
-    },
+  //     return this;
+  //   },
 
-    pop: function () {
-      if (!this.length()) return;
+  //   pop: function () {
+  //     if (!this.length()) return;
 
-      this.keys.pop();
-      return this.values.pop();
-    },
+  //     this.keys.pop();
+  //     return this.values.pop();
+  //   },
 
-    //根据索引返回对应键值
-    indexOf: function (value) {
-      var index = _.indexOf(this.vaules, value);
-      if (index != -1) return this.keys[index];
-      return -1;
-    },
+  //   //根据索引返回对应键值
+  //   indexOf: function (value) {
+  //     var index = _.indexOf(this.vaules, value);
+  //     if (index != -1) return this.keys[index];
+  //     return -1;
+  //   },
 
-    //移出栈底值
-    shift: function () {
-      if (!this.length()) return;
+  //   //移出栈底值
+  //   shift: function () {
+  //     if (!this.length()) return;
 
-      this.keys.shift();
-      return this.values.shift();
-    },
+  //     this.keys.shift();
+  //     return this.values.shift();
+  //   },
 
-    //往栈顶压入值
-    unShift: function (key, vaule, order) {
-      if (_.isObject(key)) {
-        for (var i in key) {
-          if (key.hasOwnProperty(i)) this.unShift(i, key[i], order);
-        }
-        return;
-      }
-      if (order) this.remove(key);
-      this.keys.unshift(key);
-      this.vaules.unshift(value);
-    },
+  //   //往栈顶压入值
+  //   unShift: function (key, vaule, order) {
+  //     if (_.isObject(key)) {
+  //       for (var i in key) {
+  //         if (key.hasOwnProperty(i)) this.unShift(i, key[i], order);
+  //       }
+  //       return;
+  //     }
+  //     if (order) this.remove(key);
+  //     this.keys.unshift(key);
+  //     this.vaules.unshift(value);
+  //   },
 
-    //返回hash表的一段数据
-    //
-    slice: function (start, end) {
-      var keys = this.keys.slice(start, end || null);
-      var values = this.values.slice(start, end || null);
-      var hash = new _.Hash();
+  //   //返回hash表的一段数据
+  //   //
+  //   slice: function (start, end) {
+  //     var keys = this.keys.slice(start, end || null);
+  //     var values = this.values.slice(start, end || null);
+  //     var hash = new _.Hash();
 
-      for (var i = 0; i < keys.length; i++) {
-        hash.push(keys[i], values[i]);
-      }
+  //     for (var i = 0; i < keys.length; i++) {
+  //       hash.push(keys[i], values[i]);
+  //     }
 
-      return obj;
-    },
+  //     return obj;
+  //   },
 
-    //由start开始，移除元素
-    splice: function (start, count) {
-      var keys = this.keys.splice(start, end || null);
-      var values = this.values.splice(start, end || null);
-      var hash = new _.Hash();
+  //   //由start开始，移除元素
+  //   splice: function (start, count) {
+  //     var keys = this.keys.splice(start, end || null);
+  //     var values = this.values.splice(start, end || null);
+  //     var hash = new _.Hash();
 
-      for (var i = 0; i < keys.length; i++) {
-        hash.push(keys[i], values[i]);
-      }
+  //     for (var i = 0; i < keys.length; i++) {
+  //       hash.push(keys[i], values[i]);
+  //     }
 
-      return obj;
-    },
+  //     return obj;
+  //   },
 
-    exist: function (key, value) {
-      var b = true;
+  //   exist: function (key, value) {
+  //     var b = true;
 
-      if (_.indexOf(this.keys, key) == -1) b = false;
+  //     if (_.indexOf(this.keys, key) == -1) b = false;
 
-      if (!_.isUndefined(value) && _.indexOf(this.values, value) == -1) b = false;
+  //     if (!_.isUndefined(value) && _.indexOf(this.values, value) == -1) b = false;
 
-      return b;
-    },
+  //     return b;
+  //   },
 
 
-    filter: function () {
+  //   filter: function () {
 
-    }
-  });
+  //   }
+  // });
 
-  //获取url参数
-  //这个方法还是有问题
-  method.getUrlParam = function (url, key) {
-    if (!url) url = window.location.href;
+  // //获取url参数
+  // //这个方法还是有问题
+  // method.getUrlParam = function (url, key) {
+  //   if (!url) url = window.location.href;
 
-    var searchReg = /([^&=?]+)=([^&]+)/g;
-    var urlReg = /\/+.*\?/;
-    var arrayReg = /(.+)\[\]$/;
-    var urlParams = {};
-    var match, name, value, isArray;
+  //   var searchReg = /([^&=?]+)=([^&]+)/g;
+  //   var urlReg = /\/+.*\?/;
+  //   var arrayReg = /(.+)\[\]$/;
+  //   var urlParams = {};
+  //   var match, name, value, isArray;
 
-    url = decodeURIComponent(url);
-    while (match = searchReg.exec(url)) {
-      name = match[1];
-      value = match[2];
-      isArray = name.match(arrayReg);
-      //处理参数为url这种情况
-      if (urlReg.test(value)) {
-        urlParams[name] = url.substr(url.indexOf(value));
-        break;
-      } else {
-        if (isArray) {
-          name = isArray[1];
-          urlParams[name] = urlParams[name] || [];
-          urlParams[name].push(value);
-        } else {
-          urlParams[name] = value;
-        }
-      }
-    }
+  //   url = decodeURIComponent(url);
+  //   while (match = searchReg.exec(url)) {
+  //     name = match[1];
+  //     value = match[2];
+  //     isArray = name.match(arrayReg);
+  //     //处理参数为url这种情况
+  //     if (urlReg.test(value)) {
+  //       urlParams[name] = url.substr(url.indexOf(value));
+  //       break;
+  //     } else {
+  //       if (isArray) {
+  //         name = isArray[1];
+  //         urlParams[name] = urlParams[name] || [];
+  //         urlParams[name].push(value);
+  //       } else {
+  //         urlParams[name] = value;
+  //       }
+  //     }
+  //   }
 
-    return key ? urlParams[key] : urlParams;
-  };
+  //   return key ? urlParams[key] : urlParams;
+  // };
+  // ------------------------------------
 
   _.extend(_, method);
 

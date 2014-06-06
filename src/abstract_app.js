@@ -25,7 +25,7 @@ var Application = _.inherit({
     //本地维护History逻辑，暂时不予关注
     this.history = [];
 
-    //是否开启路由监控 
+    //是否开启路由监控
     this.isListeningRoute = false;
 
     //view的根目录
@@ -165,7 +165,7 @@ var Application = _.inherit({
 
     //每个键值还是在全局views保留一个存根，若是已经加载过便不予理睬
     if (this.viewExist(viewId)) {
-      _.callmethod(callback, this, this.views.getItem(viewId));
+      _.execute(callback, this, this.views.getItem(viewId));
       return;
     }
 
@@ -175,7 +175,7 @@ var Application = _.inherit({
       this.views.push(viewId, view);
 
       //将当前view实例传入，执行回调
-      _.callmethod(callback, this, view);
+      _.execute(callback, this, view);
 
     }, this));
   },
