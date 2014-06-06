@@ -7,7 +7,7 @@ var AlertView = _.inherit(Dalmatian.View, {
     };
 
     this.templateSet = {
-      'init' : '<%=data%>',
+      'init' : '<button><%=data%></button>',
       'processing': '<%=name%>',
     };
 
@@ -53,7 +53,7 @@ suite('Dalmatian.View', function() {
       var text = 'hello world';
 
       alertView.render(alertView.statusSet['INIT'], {data: text}, function() {
-        assert(alertView.html === text);
+        assert(alertView.html === '<button>hello world</button>');
       });
     });
   });
@@ -213,7 +213,7 @@ suite('Dalmatian.ViewController', function() {
     });
 
     test('should create view.root and view.html', function() {
-      assert(alertController.view.html === 'hello')
+      assert(alertController.view.html === '<button>hello</button>')
     });
   });
 
@@ -245,11 +245,251 @@ suite('Dalmatian.ViewController', function() {
         adapter: alertAdapter,
         viewstatus: alertView.statusSet['INIT'],
       });
-      assert(alertController.view.html === 'hello')
+      assert(alertController.view.html === '<button>hello</button>')
     })
   });
 
+  // @description test for api:show()
   suite('#show()', function() {
+    var alertAdapter = new AlertAdapter({
+      datamodel: {data: 'hello'}
+    });
+    var alertView = new AlertView();
 
+    test('should execute onViewBeforeShow before show and execute onViewAfterShow after show', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        container: '.container',
+        onViewBeforeShow: function() {
+          this.beforedata = 1
+          assert(typeof this.afterdata === 'undefined');
+        },
+        onViewAfterShow: function() {
+          this.afterdata = 2;
+          assert(this.afterdata > this.beforedata);
+        }
+      });
+      alertController.show();
+
+      var displaySetting = alertController.$el.css('display');
+      assert(displaySetting === 'undefined' || displaySetting === 'block')
+    });
+
+    test('should append view onto document', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        container: '.container'
+      });
+      alertController.show();
+      assert($('#'+alertView.viewid).length > 0);
+    })
   });
+
+  suite('#recreate()', function() {
+    var alertAdapter = new AlertAdapter({
+      datamodel: {data: 'hello'}
+    });
+    var alertView = new AlertView();
+
+    test('should execute onViewBeforeRecreate before recreate and execute onViewAfterRecreate after recreate', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        container: '.container',
+        onViewBeforeRecreate: function() {
+          this.beforedata = 1
+          assert(typeof this.afterdata === 'undefined');
+        },
+        onViewAfterRecreate: function() {
+          this.afterdata = 2;
+          assert(this.afterdata > this.beforedata);
+        },
+      })
+      alertController.recreate();
+    });
+
+    // 当调用recreate时默认会调用onViewUpdate
+    test('should execute update method to update or render view', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        container: '.container',
+        onViewUpdate: function() {
+          assert(true);
+        }
+      });
+      alertController.recreate();
+    });
+  });
+
+  suite('#hide()', function() {
+    var alertAdapter = new AlertAdapter({
+      datamodel: {data: 'hello'}
+    });
+    var alertView = new AlertView();
+
+    test('should execute onViewBeforeHide before hide and execute onViewAfterHide after hide', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        container: '.container',
+        onViewBeforeHide: function() {
+          this.beforedata = 1
+          assert(typeof this.afterdata === 'undefined');
+        },
+        onViewAfterHide: function() {
+          this.afterdata = 2;
+          assert(this.afterdata > this.beforedata);
+        },
+      })
+      alertController.hide();
+    });
+
+    // 当调用recreate时默认会调用onViewUpdate
+    test('should execute update method to update or render view', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        container: '.container',
+      });
+      alertController.show();
+      alertController.hide();
+
+      var displaySetting = alertController.$el.css('display');
+      assert(displaySetting === 'none');
+    });
+  });
+
+  suite('#bindEvents()', function() {
+    var alertAdapter = new AlertAdapter({
+      datamodel: {data: 'hello'}
+    });
+    var alertView = new AlertView();
+
+    test('parse events map and set events to dom', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        container: '.container',
+        events: {
+          'click button': 'clickbtn'
+        },
+        clickbtn: function() {
+          assert(true);
+        }
+      });
+
+      alertController.show();
+      $('.container button').trigger('click');
+    });
+  });
+
+  suite('#unBindEvents()', function() {
+    var alertAdapter = new AlertAdapter({
+      datamodel: {data: 'hello'}
+    });
+    var alertView = new AlertView();
+
+    test('forze all events on dom', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        container: '.container',
+        events: {
+          'click button': 'clickbtn'
+        },
+        clickbtn: function() {
+          assert(false);
+        }
+      });
+
+      alertController.show();
+      alertController.unBindEvents();
+      $('.container button').trigger('click');
+    });
+  });
+
+  suite('#forze()', function() {
+    var alertAdapter = new AlertAdapter({
+      datamodel: {data: 'hello'}
+    });
+    var alertView = new AlertView();
+
+    test('should execute onViewBeforeForzen before hide and execute onViewAfterForzen after hide', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        container: '.container',
+        onViewBeforeForzen: function() {
+          this.beforedata = 1
+          assert(typeof this.afterdata === 'undefined');
+        },
+        onViewAfterForzen: function() {
+          this.afterdata = 2;
+          assert(this.afterdata > this.beforedata);
+        },
+      });
+      alertController.show();
+      alertController.forze();
+    });
+
+    test('should execute unBindEvents to cancel all events on dom', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        container: '.container',
+        events: {
+          'click button': 'clickbtn'
+        },
+        clickbtn: function() {
+          assert(false);
+        },
+      });
+
+      alertController.show();
+      alertController.forze();
+      $('.container button').trigger('click');
+    });
+  });
+
+  suite('#destory()', function() {
+    var alertAdapter = new AlertAdapter({
+      datamodel: {data: 'hello'}
+    });
+    var alertView = new AlertView();
+
+    test('should execute onViewBeforeDestory before destory and execute onViewAfterDestory after destory and $el would be remove after destory', function() {
+      var alertController = new AlertController({
+        view: alertView,
+        adapter: alertAdapter,
+        viewstatus: alertView.statusSet['INIT'],
+        container: '.container',
+        onViewBeforeDestory: function() {
+          this.beforedata = 1
+          assert(typeof this.afterdata === 'undefined');
+        },
+        onViewAfterDestory: function() {
+          this.afterdata = 2;
+          assert(this.afterdata > this.beforedata);
+        },
+      });
+      alertController.show();
+      alertController.destory();
+
+      assert(alertController.$el.html() === '');
+    });
+  })
+
 });

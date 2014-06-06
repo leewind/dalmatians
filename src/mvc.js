@@ -261,6 +261,14 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
+   * [_recreate description]
+   * 私有方法，调用update方法执行页面刷新，update方法可以被复写做dom操作
+   */
+  _recreate: function () {
+    this.update();
+  },
+
+  /**
    * [_show description]
    * 私有方法，将dom黏贴到document上去，并且设置页面为显示
    */
@@ -268,6 +276,34 @@ Dalmatian.ViewController = _.inherit({
     this.bindEvents();
     $(this.container).append(this.$el);
     this.$el.show();
+  },
+
+  /**
+   * [_hide description]
+   * 私有方法，将dom隐藏，并且将所有的绑定在dom上的事件冻结
+   * @return {[type]} [description]
+   */
+  _hide: function () {
+    this.forze();
+    this.$el.hide();
+  },
+
+  /**
+   * [_forze description]
+   * 私有方法，冻结dom的所有元素上的所有事件
+   * @return {[type]} [description]
+   */
+  _forze: function () {
+    this.unBindEvents();
+  },
+
+  /**
+   * [_destory description]
+   * 私有方法，先冻结dom之后移除dom
+   */
+  _destory: function () {
+    this.unBindEvents();
+    this.$el.empty();
   },
 
   /**
@@ -322,20 +358,22 @@ Dalmatian.ViewController = _.inherit({
   //   this.viewstatus = status;
   // },
 
-  // @description 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话，直接调用render方法重绘
-  // @notation 这个方法需要重构
+  /**
+   * [update description]
+   * 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话
+   * 直接调用render方法重绘
+   * 这个方法可以被复写，开发者可以用update接口来操作具体dom
+   *
+   * @param  {[object]} data [adapter中的viewmodel]
+   * @return {[boolean]}     [回调结束标识符]
+   */
   update: function (data) {
 
-    //    _.callmethod(this.hide, this);
-
     if (this.onViewUpdate) {
-      _.callmethod(this.onViewUpdate, this, [data]);
-      return;
+      return _.callmethod(this.onViewUpdate, this, [data]);
     }
 
     this.render();
-
-    //    _.callmethod(this.show, this);
   },
 
   /**
@@ -357,28 +395,54 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
-  * @description 如果进入create判断是否需要update一下页面，sync view和viewcontroller的数据
-  */
-  _recreate: function () {
-    this.update();
-  },
-
+   * [recreate description]
+   * 生命周期recreate,提供了两个回调onViewBeforeRecreate和onViewAfterRecreate
+   */
   recreate: function () {
     _.wrapmethod(this._recreate, 'onViewBeforeRecreate', 'onViewAfterRecreate', this);
   },
 
-  //事件注册点
+  /**
+   * [hide description]
+   * 生命周期recreate,提供了两个回调onViewBeforeHide和onViewAfterHide
+   */
+  hide: function () {
+    _.wrapmethod(this._hide, 'onViewBeforeHide', 'onViewAfterHide', this);
+  },
+
+  /**
+   * [forze description]
+   * 生命周期forze,提供了两个回调onViewBeforeForzen和onViewAfterForzen
+   */
+  forze: function () {
+    _.wrapmethod(this._forze, 'onViewBeforeForzen', 'onViewAfterForzen', this);
+  },
+
+  /**
+   * [destory description]
+   * 生命周期destory，提供了两个回调onViewBeforeDestory和onViewAfterDestory
+   *
+   * @return {[type]} [description]
+   */
+  destory: function () {
+    _.wrapmethod(this._destory, 'onViewBeforeDestory', 'onViewAfterDestory', this);
+  },
+
+  /**
+   * [bindEvents description]
+   * 解析events，根据events的设置在dom上设置事件
+   */
   bindEvents: function () {
     var events = this.events;
 
     if (!(events || (events = _.result(this, 'events')))) return this;
     this.unBindEvents();
 
-    // @description 解析event参数的正则
+    // 解析event参数的正则
     var delegateEventSplitter = /^(\S+)\s*(.*)$/;
     var key, method, match, eventName, selector;
 
-    //注意，此处做简单的字符串数据解析即可，不做实际业务
+    // 做简单的字符串数据解析
     for (key in events) {
       method = events[key];
       if (!_.isFunction(method)) method = this[events[key]];
@@ -399,36 +463,15 @@ Dalmatian.ViewController = _.inherit({
     return this;
   },
 
-  //取消所有事件
+  /**
+   * [unBindEvents description]
+   * 冻结dom上所有元素的所有事件
+   *
+   * @return {[type]} [description]
+   */
   unBindEvents: function () {
     this.$el.off('.delegateEvents' + this.view.viewid);
     return this;
   },
 
-  _hide: function () {
-    this.forze();
-    this.$el.hide();
-  },
-
-  hide: function () {
-    _.wrapmethod(this._hide, 'onViewBeforeHide', 'onViewAfterHide', this);
-  },
-
-  _forze: function () {
-    this.unBindEvents();
-  },
-
-  forze: function () {
-    _.wrapmethod(this._forze, 'onViewBeforeForzen', 'onViewAfterForzen', this);
-  },
-
-  _destory: function () {
-    this.unBindEvents();
-    this.$el.remove();
-    //    delete this;
-  },
-
-  destory: function () {
-    _.wrapmethod(this._destory, 'onViewBeforeDestory', 'onViewAfterDestory', this);
-  }
 });
