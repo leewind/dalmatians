@@ -1,12 +1,8 @@
-if (typeof require === 'function') {
-  var assert = require("assert");
-  var _ = require("../src/underscore-extend");
-};
+suite('Underscore.extend', function() {
 
-describe("underscore.extend", function() {
-  describe("inherit", function() {
-    it('should inherit object function', function() {
+  suite('#inherit(father, methods)', function() {
 
+    test('should inherit object function', function() {
       var origin = _.inherit({
         name: 'origin',
         tag: 'origin',
@@ -42,11 +38,11 @@ describe("underscore.extend", function() {
       assert(expectInstance.name === realInstance.name, 'name value should be inherited');
       assert(expectInstance.show() === realInstance.show());
       assert(expectInstance.spec() === realInstance.spec());
-    });
+    })
   });
 
-  describe("getNeedFn", function() {
-    it('should return function by key value', function() {
+  suite("getNeedFn", function() {
+    test('should return function by key value', function() {
       var action = function() {
         return 'keyFn'
       }
@@ -68,4 +64,5 @@ describe("underscore.extend", function() {
       assert(typeof requireFn === 'function');
     });
   });
+
 });
