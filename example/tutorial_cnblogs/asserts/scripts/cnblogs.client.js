@@ -11,6 +11,7 @@ var ListView = _.inherit(Dalmatian.View, {
     $super(options);
   }
 });
+var listView = new ListView();
 
 var ListAdapter = _.inherit(Dalmatian.Adapter, {
   format: function() {
@@ -30,12 +31,13 @@ var ListAdapter = _.inherit(Dalmatian.Adapter, {
     return this.viewmodel;
   }
 });
+var listAdapter = new ListAdapter();
 
 var ListController = _.inherit(Dalmatian.ViewController, {
   //设置默认信息
   initialize: function ($super, options) {
-    this.view = new ListView();
-    this.adapter = new ListAdapter();
+    this.view = listView;
+    this.adapter = listAdapter;
     this.container = '.hotlist';
 
     this.messagebox = new Dalmatian.MessageBox({
@@ -49,7 +51,8 @@ var ListController = _.inherit(Dalmatian.ViewController, {
   },
 
   render: function () {
-    this.view.render(this.viewstatus, this.adapter.getViewModel());
+    var html = this.view.render(this.viewstatus, this.adapter.getViewModel());
+    console.log(html)
     this.view.root.html(this.view.html);
   },
 
@@ -101,7 +104,9 @@ var ListController = _.inherit(Dalmatian.ViewController, {
   }
 });
 
-var controller = new ListController();
+var controller = new ListController({
+  viewstatus: 'init'
+});
 controller.show();
 
 
@@ -138,8 +143,6 @@ var ContentController = _.inherit(Dalmatian.ViewController, {
       namespace: 'cnblog-hotposts',
       onReceived: function(message) {
 
-        console.log(message)
-
         if (message && message.data && message.data.postid) {
           scope.readPost(message.data.postid);
         }
@@ -164,7 +167,6 @@ var ContentController = _.inherit(Dalmatian.ViewController, {
       $.ajax({
         url: 'http://dalcnblog.sinaapp.com/api/blog/'+postid,
         success: function(data) {
-          console.log(data);
           $('.content').html(data.string);
 
           scope.lock = false;
@@ -177,5 +179,7 @@ var ContentController = _.inherit(Dalmatian.ViewController, {
   }
 });
 
-var contenController = new ContentController();
+var contenController = new ContentController({
+  viewstatus: 'init'
+});
 contenController.show();
