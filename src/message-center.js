@@ -55,7 +55,9 @@ Dalmatian.MessageBox = _.inherit({
   },
 
   remove: function(message) {
-    _.without(this.archive, message);
+    this.archive = _.filter(this.archive, function(archivedMessage) {
+      archivedMessage.id !== message.id
+    });
   },
 
   clear: function() {
