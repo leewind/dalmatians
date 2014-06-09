@@ -42,6 +42,7 @@ var ListController = _.inherit(Dalmatian.ViewController, {
       center: messagecenter,
       namespace: 'cnblog-hotposts'
     });
+    this.viewstatus = 'init';
 
     messagecenter.register(this.messagebox);
 
@@ -53,17 +54,17 @@ var ListController = _.inherit(Dalmatian.ViewController, {
     this.view.root.html(this.view.html);
   },
 
-  onViewAfterShow: function() {
+  onViewAfterShow: function () {
 
     var scope = this;
     $.ajax({
       type: 'get',
       url: 'http://dalcnblog.sinaapp.com/api/48HoursTopViewPosts/10',
-      success: function(data) {
+      success: function (data) {
         scope.adapter.datamodel = data;
         scope.adapter.notifyDataChanged();
       },
-      error: function(error) {
+      error: function (error) {
         console.error(error)
       }
     })
@@ -73,7 +74,7 @@ var ListController = _.inherit(Dalmatian.ViewController, {
     'click .hotlist li': 'readPost'
   },
 
-  readPost: function(event) {
+  readPost: function (event) {
     console.log($(event.currentTarget).attr('data-id'));
 
 
@@ -96,7 +97,7 @@ var ListController = _.inherit(Dalmatian.ViewController, {
     //   })
     // };
 
-    var message = this.messagebox.create({postid: postid});
+    var message = this.messagebox.create({ postid: postid });
     this.messagebox.send('cnblog-hotposts', null, message);
   }
 });
