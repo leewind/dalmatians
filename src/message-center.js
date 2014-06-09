@@ -2,12 +2,24 @@
 
 var Dalmatian = Dalmatian || {};
 
+/**
+ * Message数据对象，封装了message的id和具体的data
+ */
 var Message = Dalmatian.Message = _.inherit({
+
+  /**
+   * 初始化方法，设置需要传入的参数，创建message的唯一id
+   * @param  {object} options 用户需要设置的属性
+   */
   initialize: function(options) {
     this.data = options.data;
     this.id = _.uniqueId('message-');
   },
 
+  /**
+   * 获得message的id和数据
+   * @return {object} 返回id和message带有的数据，其结构一定为：{id: _id, data: _data}
+   */
   get: function() {
     return {
       id: this.id,
@@ -16,33 +28,48 @@ var Message = Dalmatian.Message = _.inherit({
   }
 });
 
-Dalmatian.MessageBox = _.inherit({
+var MessageBox = Dalmatian.MessageBox = _.inherit({
 
-  initialize: function(options) {
-    this.handleOptions(options);
-  },
-
+  /**
+   * 验证用户传入的数据是不是有必须的字段
+   * @param  {object} options 用户传入需要设置成属性的参数
+   */
   _verify: function(options) {
-    // if (!_.property('center')(options)) throw Error('MessageBox必須知道MessageCenter');
-
     if (!_.property('namespace')(options)) throw Error('MessageBox必須有自己的namspace');
   },
 
+  /**
+   * 调用handleOptions方法，将用户传入的参数设置成对象属性
+   * 创建历史消息队列，创建MessageBox的id
+   * @param  {object} options 用户传入需要设置成属性的参数
+   */
+  initialize: function(options) {
+    this.archive = [];
+    this.id = _.uniqueId('message-box-');
+
+    this.handleOptions(options);
+  },
+
+  /**
+   * 将用户传入的参数设置成对象属性，可以设置3个字段namespace/center/onReceived
+   * @param  {object} options 用户传入需要设置成属性的参数
+   */
   handleOptions: function(options) {
     this._verify(options);
 
     this.namespace = options.namespace;
     this.center = options.center;
 
-    this.archive = [];
-
     if (_.isFunction(options.onReceived)) {
       this.onReceived = options.onReceived;
     }
-
-    this.id = _.uniqueId('message-box-');
   },
 
+  /**
+   * 创建并返回Message，同时把创建的Message存档
+   * @param  {object} data  用户需要传递和封装的信息
+   * @return {Message}      根据传入的data创建的Message对象
+   */
   create: function(data) {
     var message = new Message({ data: data });
     this.archive.push(message);
@@ -50,37 +77,69 @@ Dalmatian.MessageBox = _.inherit({
     return message;
   },
 
+  /**
+   * 根据namespace/messageboxid将Message传递到具体的MessageBox
+   * @param  {string} namespace    MessageBox的命名空间
+   * @param  {string} messageboxid MessageBox的具体id
+   * @param  {Message} message     需要传递的Message对象
+   */
   send: function(namespace, messageboxid, message) {
     this.center.dispatch(namespace, messageboxid, message);
   },
 
+  /**
+   * 删除存档队列中的message对象
+   * @param  {Message} message 需要删除的message对象
+   */
   remove: function(message) {
     this.archive = _.filter(this.archive, function(archivedMessage) {
       archivedMessage.id !== message.id
     });
   },
 
+  /**
+   * 清楚存档队列中所有message
+   */
   clear: function() {
     this.archive = [];
   }
 });
 
-Dalmatian.MessageGroup = _.inherit({
+var MessageGroup = Dalmatian.MessageGroup = _.inherit({
+
+  /**
+   * 初始化MessageGroup，初始化members队列
+   * @param  {object} options 用户传入的需要设置成属性的参数
+   */
   initialize: function(options) {
+    this.members = [];
     this.handleOptions(options);
   },
 
+  /**
+   * 设置用户传入的参数，只允许传入namespace
+   * @param  {object} options 用户传入的需要设置成属性的参数
+   */
   handleOptions: function(options) {
     this.namespace = options.namespace;
-    this.members = [];
   }
 });
 
-Dalmatian.MessageCenter = _.inherit({
+var MessageCenter = Dalmatian.MessageCenter = _.inherit({
+
+  /**
+   * 初始化groups队列
+   */
   initialize: function() {
     this.groups = [];
   },
 
+  /**
+   * 根据namespace/messageboxid将Message分发到具体的MessageBox
+   * @param  {string} namespace    MessageBox的命名空间
+   * @param  {string} messageboxid MessageBox的具体id
+   * @param  {Message} message     需要传递的Message对象
+   */
   dispatch: function(namespace, messageboxid, message) {
     if (namespace) {
       var targetspace = _.filter(this.groups, function(group) {
@@ -103,6 +162,11 @@ Dalmatian.MessageCenter = _.inherit({
     }
   },
 
+  /**
+   * 将messagebox注册到messagegroup中，根据namespace来建立messagegroup
+   * 如果存在messagegroup直接推入，如果不存在messagegroup再推入
+   * @param  {MessageBox} messagebox 需要group的messagebox实例
+   */
   register: function(messagebox) {
     var scope = this;
     var existgroup = _.filter(this.groups, function(group) {
@@ -133,6 +197,11 @@ Dalmatian.MessageCenter = _.inherit({
     }
   },
 
+  /**
+   * 将messagebox从messagegroup中，根据namespace来移除
+   * 如果移除后messagegroup没有messagebox实例则删除该messagegroup
+   * @param  {MessageBox} messagebox 需要移除group的messagebox实例
+   */
   unregister: function(messagebox) {
     _.each(this.groups, function(group) {
       var exist = _.filter(group.members, function(member) {
@@ -152,6 +221,7 @@ Dalmatian.MessageCenter = _.inherit({
   }
 });
 
+// 单例模式，惰性生成MessageCenter实例
 Dalmatian.MessageCenter.getInstance = function() {
   if (!this.instance) {
     this.instance = new Dalmatian.MessageCenter();
