@@ -1,11 +1,11 @@
 "use strict";
 
-Dalmatian = Dalmatian || {};
+var Dalmatian = Dalmatian || {};
 
 var Message = Dalmatian.Message = _.inherit({
   initialize: function(options) {
     this.data = options.data;
-    this.id = _.unique('message-');
+    this.id = _.uniqueId('message-');
   },
 
   get: function() {
@@ -23,7 +23,7 @@ Dalmatian.MessageBox = _.inherit({
   },
 
   _verify: function(options) {
-    if (!_.property('center')(options)) throw Error('MessageBox必須知道MessageCenter');
+    // if (!_.property('center')(options)) throw Error('MessageBox必須知道MessageCenter');
 
     if (!_.property('namespace')(options)) throw Error('MessageBox必須有自己的namspace');
   },
@@ -40,7 +40,7 @@ Dalmatian.MessageBox = _.inherit({
       this.onReceived = options.onReceived;
     }
 
-    this.id = _.unique('message-box-');
+    this.id = _.uniqueId('message-box-');
   },
 
   create: function(data) {
@@ -74,7 +74,6 @@ Dalmatian.MessageGroup = _.inherit({
   }
 });
 
-
 Dalmatian.MessageCenter = _.inherit({
   initialize: function() {
     this.groups = [];
@@ -89,7 +88,7 @@ Dalmatian.MessageCenter = _.inherit({
       var targets = targetspace[0];
 
       if (messageboxid) {
-        targets = _.filter(targetspace.member, function(member) {
+        targets.members = _.filter(targets.members, function(member) {
           return member.id === messageboxid;
         });
       }
@@ -100,10 +99,10 @@ Dalmatian.MessageCenter = _.inherit({
         }
       });
     }
-
   },
 
   register: function(messagebox) {
+    var scope = this;
     var existgroup = _.filter(this.groups, function(group) {
       return group.namespace === messagebox.namespace;
     });
@@ -113,6 +112,7 @@ Dalmatian.MessageCenter = _.inherit({
         namespace: messagebox.namespace
       });
 
+      messagebox.center = scope;
       messagegroup.members.push(messagebox);
 
       this.groups.push(messagegroup);
@@ -124,6 +124,7 @@ Dalmatian.MessageCenter = _.inherit({
         });
 
         if (!existmember || existmember.length === 0) {
+          messagebox.center = scope;
           group.members.push(messagebox);
         }
       });
@@ -131,7 +132,7 @@ Dalmatian.MessageCenter = _.inherit({
   },
 
   unregister: function(messagebox) {
-    _.each(ths.groups, function(group) {
+    _.each(this.groups, function(group) {
       var exist = _.filter(group.members, function(member) {
         return member.id === messagebox.id;
       });
@@ -141,6 +142,10 @@ Dalmatian.MessageCenter = _.inherit({
           group.members = _.without(group.members, box);
         });
       }
+    });
+
+    this.groups = _.filter(this.groups, function(group) {
+      return group.members > 0;
     });
   }
 });
