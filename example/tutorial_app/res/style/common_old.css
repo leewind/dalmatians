@@ -1,0 +1,165 @@
+﻿html,body,p,ul,ol,li,h1,h2,h3,h4,dl,dt,dd{ padding:0px; margin:0px; }
+img{ border:0px; }
+body{ font-size:14px;font-family: arial; background:#e4e4e4;}
+a,a:active,a:link,a:visited{ color:#333; text-decoration:none; }
+.clearboth{ }
+.clearboth:after{ content:''; display:block; overflow:hidden; width:0px; height:0px; clear:both;}
+#main_frame{ min-width:240px; }
+/* header */
+.header{ height:60px; position:relative; background:#0073c3;}
+.header .back{ position:absolute; left:0px; top:0px; width:80px; height:100%; text-indent:-9999px; overflow:hidden;  }
+.header .back:after{ content:''; position:absolute; top:50%; left:50%; width:18px; height:22px; margin-left:-11px; margin-top:-11px; background:url("images/ico_head.png") no-repeat left center; background-size:auto 22px; }
+.header .header-title{ line-height:60px; font-size:18px; font-weight:bold; text-align:center; color:#fff; }
+
+/* 按键 */
+.widget-button{}
+.widget-button .widget-label{ height:30px; line-height:30px; padding-left:26px; position:relative;}
+.widget-button .widget-label:after{ content:''; display:block; position:absolute; top:5px; left:5px; width:20px; height:20px; overflow:hidden; }
+.widget-button .widget-value{ background:#f2f2f2; height:45px; line-height:45px; padding-left:15px; font-weight:bold;}
+/* 布局定义 */
+.main-viewport{ position:relative;  }
+.sub-viewport{ position:relative; z-index:10; overflow:hidden;}
+
+/* 加载 */
+.lazyload-bg{ background:url('/webapp/res/images/img-loading.gif') no-repeat center center; }
+
+
+.hiddenx{ overflow-x:hidden;overflow-y:auto;}
+/* 动画定义 */
+/* 向右关闭和进入 */
+@-webkit-keyframes sliderightout
+{
+    from{
+        -webkit-transform:translate(0%,0%);
+    }
+    to{
+        -webkit-transform:translate(100%,0%);
+    }
+}
+@-webkit-keyframes slideleftin
+{
+    from{
+        -webkit-transform:translate(-100%,0%);
+    }
+    to{
+        -webkit-transform:translate(0%,0%);
+    }
+}
+
+@-webkit-keyframes slideleftout
+{
+    from{
+        -webkit-transform:translate(0%,0%);
+    }
+    to{
+        -webkit-transform:translate(-100%,0%);
+    }
+}
+@-webkit-keyframes sliderightin
+{
+    from{
+        -webkit-transform:translate(100%,0%);
+    }
+    to{
+        -webkit-transform:translate(0%,0%);
+    }
+}
+
+/* firefox */
+@-moz-keyframes sliderightout
+{
+    from{
+        -moz-transform:translate(0%,0%);
+    }
+    to{
+        -moz-transform:translate(100%,0%);
+    }
+}
+@-moz-keyframes slideleftin
+{
+    from{
+        -moz-transform:translate(-100%,0%);
+    }
+    to{
+        -moz-transform:translate(0%,0%);
+    }
+}
+
+@-moz-keyframes slideleftout
+{
+    from{
+        -moz-transform:translate(0%,0%);
+    }
+    to{
+        -moz-transform:translate(-100%,0%);
+    }
+}
+@-moz-keyframes sliderightin
+{
+    from{
+        -moz-transform:translate(100%,0%);
+    }
+    to{
+        -moz-transform:translate(0%,0%);
+    }
+}
+
+.slideleftout
+{
+    -webkit-animation:slideleftout 0.7s ease;
+    -moz-animation:slideleftout 0.7s ease;
+}
+.slideleftin
+{
+    -webkit-animation:slideleftin 0.7s ease;
+    -moz-animation:slideleftin 0.7s ease;
+}
+
+.sliderightout
+{
+    -webkit-animation:sliderightout 0.7s ease;
+    -moz-animation:sliderightout 0.7s ease;
+}
+.sliderightin
+{
+    -webkit-animation:sliderightin 0.7s ease;
+    -moz-animation:sliderightin 0.7s ease;
+}
+body .animatestart{ position:absolute;top:0px;left:0px;z-index:1; width:100%; }
+/* loading */
+.loading { width:60px; height:60px;margin:0 auto; overflow:hidden; border-radius:5px; background:url(http://res.m.ctrip.com/html5/content/images/ajax-loader.gif?v=1.0) center center no-repeat;  }
+@-webkit-keyframes loading {
+	0%		{ -webkit-transform:rotate(0); }
+	100%	{ -webkit-transform:rotate(360deg); }
+}
+@-moz-keyframes loading {
+	0%		{ -webkit-transform:rotate(0); }
+	100%	{ -webkit-transform:rotate(360deg); }
+}
+@-o-keyframes loading {
+	0%		{ -webkit-transform:rotate(0); }
+	100%	{ -webkit-transform:rotate(360deg); }
+}
+@keyframes loading {
+	0%		{ -webkit-transform:rotate(0); }
+	100%	{ -webkit-transform:rotate(360deg); }
+}
+.loading-slogan { display:none;  }
+
+.loading-slogan { display:none;  }
+
+/** 默认select样式 **/
+.cui-select-title-box{ height:60px; line-height:60px; overflow:hidden; background:#0073c3; position:relative; }
+.cui-select-fullscreen .cui-select-title-box .cui-select-title{ height:60px; line-height:60px; font-size:20px; font-weight:bold; color:#fff;}
+.cui-select-title-box .cui-select-title-leftback{ height:100%; width:60px; position:absolute; left:0px; top:0px; z-index:1;}
+.cui-select-title-box .cui-select-title-leftback span{ position:absolute; left:20px; top:20px; width:14px; height:20px;  background: url(../images/ticket_bg.png) 0 -172px no-repeat; background-size: 91px 212px;}
+.cui-select-title-box .cui-select-title-leftback:active{ background:#005C9C; }
+.cui-originselect-fixed-title { width:100%; text-align:right;}
+/** 默认calendar **/
+.calhead-box{ height:60px; line-height:60px; background:#0073c3; position:relative; text-align:center;}
+.calhead-box .calhead-back{ position:absolute; left:0px; top:0px; width:60px; height:100%; }
+.calhead-box .calhead-back:active{ background:#005C9C; }
+.calhead-box .calhead-back span{ margin-top:20px; margin-left:20px; width:14px; height:20px; float:left; background: url(../images/ticket_bg.png) 0 -172px no-repeat;background-size: 91px 212px;}
+.calhead-box .calhead-title{ height:100%; font-size:20px; font-weight:bold; color:#fff; }
+
+

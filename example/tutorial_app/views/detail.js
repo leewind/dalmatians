@@ -1,5 +1,4 @@
-﻿define(['text!templates/index.html', 'text!templates/index_item.html'], function (html, itemHtml) {
-
+﻿define(['text!templates/detail.html', 'text!templates/detail_article.html'], function (html, article) {
   var View = _.inherit(Dalmatian.View, {
     _initialize: function ($super) {
       $super();
@@ -7,7 +6,7 @@
       this.templateSet = {
         init: html,
         loading: '<div>正在加载请稍后...</div>',
-        ajaxSuc: itemHtml
+        ajaxSuc: article
       };
     }
   });
@@ -19,11 +18,11 @@
     },
 
     format: function (datamodel) {
-      return datamodel && datamodel.feed && datamodel.feed.entry;
+      return datamodel && datamodel.value;
     },
 
     setData: function (data) {
-      this.datamodel = data;
+      this.datamodel.value = data;
       this.notifyDataChanged();
     }
 
@@ -45,8 +44,7 @@
       var viewdata = this.adapter.getViewModel();
 
       var wrapperSet = {
-        loading: '#lstbox',
-        ajaxSuc: '#lstbox'
+        ajaxSuc: '.cont_wrap'
       };
       //view具有唯一包裹器
       var root = this.view.root;
@@ -64,33 +62,24 @@
 
     //显示后Ajax请求数据
     onViewAfterShow: function () {
-      this.viewstatus = 'loading';
-
+      var id = _.getUrlParam().id;
       var scope = this;
-      $.ajax({
-        type: 'get',
-        url: 'http://dalcnblog.sinaapp.com/api/48HoursTopViewPosts/10',
-        success: function (data) {
-          scope.viewstatus = 'ajaxSuc';
-
-          scope.adapter.setData(data);
-        },
-        error: function (error) {
-          console.error(error)
-        }
-      })
+      if (id) {
+        $.ajax({
+          url: 'http://dalcnblog.sinaapp.com/api/blog/' + id,
+          success: function (data) {
+            scope.viewstatus = 'ajaxSuc';
+            scope.adapter.setData(data);
+          }
+        })
+      }
 
     },
 
 
-
     events: {
-      'click .orderItem': function (e) {
-        var el = $(e.currentTarget);
-        var id = el.attr('data-id');
-        app.forward('detail&id=' + id);
-
-        var s = '';
+      'click #js_return': function (e) {
+        app.back();
       }
     }
   });

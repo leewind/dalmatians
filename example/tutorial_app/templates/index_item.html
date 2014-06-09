@@ -1,0 +1,22 @@
+﻿<%for(var i = 0, len = obj.length; i < len; i++) { %>
+<%var item = obj[i]; %>
+<li class="arr_r orderItem" data-id="<%=item.id %>">
+    <article class="blog_item">
+        <h3>
+            <a href="<%=item.link && item.link.href %>" target="_blank"><%=item.title || '无题' %></a>
+            </h3>
+            
+        <div class="author pro_list_rank">
+            <%if(item.author.avatar){ %>
+            <a href="<%=item.author.uri %>" target="_blank">
+                <img src="<%=item.author.avatar %>">
+            </a>
+            <%} %>
+            <%=item.summary %>
+        </div>
+        <div class="item_footer">
+            <a href="<%=item.author.uri %>" class="lightblue">Scut</a> <%=item.published %> <a href="<%=item.link && item.link.href %>" title="2013-08-21 15:21" class="gray">评论(<%=item.comments %>)</a>
+            <a href="<%=item.link && item.link.href %>" class="gray">阅读(<%=item.views %>)</a> <span class="price1">推荐(<%=item.diggs %>)</span></div>
+    </article>
+</li>
+<%} %>

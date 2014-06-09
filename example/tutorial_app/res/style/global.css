@@ -1,0 +1,162 @@
+﻿/*------------------common---------------*/
+html,body,div,ul,li,h1,h2,h3,h4,h5,input,textarea,p,button,menu,section,nav{margin:0;padding:0;}
+ul, li { list-style: none; }img{border:none;margin:0;padding:0;}em,i{ font-style:normal;}
+a { color:#000000; text-decoration: none;}
+body {min-width: 320px;font-family: Tahoma, "Lucida Grande", Verdana, hei; font-size: 14px; color: #000;background: #E4E4E4;overflow-x: hidden;-webkit-text-size-adjust:none; -moz-user-select:none;}
+header {background-color: #0073c3; width:100%; height: 60px;line-height: 60px;text-align: center; position:fixed; top:0; left:0px; z-index:999; margin-bottom:60px !importantl}
+header h1{ color: #fff; font-size: 18px; font-weight:bold;}
+.tworow h1{ line-height:40px; margin:0px 70px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; height:auto;}
+header p{color: #AFCEE9;display: block;text-align: center;left: 0px;bottom: 0px; line-height:3px;}
+.lefthead{width:60px; height:60px; background-color:#0073c3;position:absolute; left:0; top:0; padding-left:10px;}.lefthead:active{background-color:#005C9C;}
+.righthead{ width:auto; height:32px; line-height:32px; padding:0 10px; background-color:#004286; color:#fff; position:absolute; right:10px; top:15px;}
+.header_return{background:url(http://res.m.ctrip.com/html5/Content/images/ico_head.png) 50% 50% no-repeat; background-size:auto 22px; background-position:0px top;width: 15px; height:22px;margin-top:16px;}
+.ui-content{ padding:10px;margin-top:60px;}.conlist{background-color: #fff;padding:10px; margin-bottom:10px;}
+.ui-grid-a,.ui-grid-b,.ui-grid-c,.ui-grid-d{overflow:hidden}.ui-block-a,.ui-block-b,.ui-block-c,.ui-block-d,.ui-block-e{margin:0;padding:0;border:0;float:left;min-height:1px}.ui-grid-a .ui-block-a,.ui-grid-a .ui-block-b{width:50%}.ui-grid-a .ui-block-a{clear:left}.ui-grid-b .ui-block-a,.ui-grid-b .ui-block-b,.ui-grid-b .ui-block-c{width:33.333%}.ui-grid-b .ui-block-a{clear:left}.ui-grid-c .ui-block-a,.ui-grid-c .ui-block-b,.ui-grid-c .ui-block-c,.ui-grid-c .ui-block-d{width:25%}.ui-grid-c .ui-block-a{clear:left}.ui-grid-d .ui-block-a,.ui-grid-d .ui-block-b,.ui-grid-d .ui-block-c,.ui-grid-d .ui-block-d,.ui-grid-d .ui-block-e{width:20%}.ui-grid-d .ui-block-a{clear:left}
+.bold{ font-weight:bold;}.price{color: #ff7800;}.m10{ margin:10px;}.p10{ padding:10px;}.mtop{ margin-top:10px;}.mleftright{ margin:0 10px;}.m60{ margin-top:60px;}.infotxt{ color:#515d68;}
+
+.logo { position:relative; width:62px; height:62px; margin-left:-31px; margin:-74px auto 0; background:#e4e4e4 url(http://res.m.ctrip.com/html5/WebApp/images/logo.png) center center no-repeat; background-size:36px auto; border-radius:50%; }
+/* 加载失败/数据为空 */
+.blank { width:86px; height:86px; margin:0px auto 0; background:url(http://res.m.ctrip.com/html5/WebApp/images/blank.png) center center no-repeat; background-size:86px auto; }
+.blanktxt{ padding:15px 0; font-size:16px; color:#666666; text-align:center; }
+/* 输入框 */
+.ui-txt{margin-bottom: 10px; padding-top:5px; background:#f2f2f2; height:35px;}
+input.ui-input-text {width: 95% !important; background:#f2f2f2 !important; border:none !important;}
+textarea{width: 96% !important; background:#f2f2f2 !important; border:none !important; border-radius:0px; padding:5px;}
+.clear-input{ display:inline-block; height:24px; width:24px; cursor: pointer; border-radius: 1em; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3); border:1px solid #ccc; text-align:center; position:relative; } 
+.clear-input:focus{box-shadow: 0 0 12px #387BBE;}
+.clear-input span{ margin:0!important;  width:18px; height:18px!important; display:inline-block; background: url(images/icons-18-white.png) no-repeat scroll 0 0 rgba(0, 0, 0, 0.4); background-position: -72px 50%; border-radius: 9px; position:absolute; left:3px; top:3px;}
+.clear-input-box{ position:relative; }
+.clear-input-box .clear-input{ position:absolute; right:6px; top:6px; }
+body .ui-icon-searchfield .clear-input{ top:4px; }
+.clear-input-box input[type="tel"],.clear-input-box input[type="text"],.clear-input-box input[type="email"],.clear-input-box input[type="password"]{ border:none; background:#f2f2f2; height:35px; width:95%; font-size:16px; padding-left:10px;; }
+/*------------------reslist---------------*/
+.res_list{ background-color:#fff;}
+.res_list_tab:after{ content:""; width: 8px; height: 15px; float:right; background:url(http://res.m.ctrip.com/html5/Content/images/ico_arrowright.png) 50% 50% no-repeat; background-size:8px 15px; position:relative; right:10px; top:35px;}
+.res_list_tab{border-bottom: 1px solid #E8EBEF;width: 100%;height:85px;overflow: hidden;font-size:14px; position:relative;-webkit-tap-highlight-color:#f2f2f2;}
+.res_list_tab li{float: left;}
+.res_img img{ width:60px; height:60px; margin:10px;}
+dfn{ color: #F0831E;font-style: normal;font-size:12px;}
+.res_price strong{font-size: 20px;color: #ff7800; font-weight:600;}
+.res_list_tab .res_ticket{width:43%; line-height:22px; padding-top:32px; color:#6B6B6B; position:absolute; left:80px;}
+.name{color: #434343;font-weight: bold;font-size: 16px; width:140%; position:absolute; left:0px; top:10px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+.derc{ height:44px;overflow: hidden;text-overflow: ellipsis;}
+.res_list_tab .res_price{width:90%; text-align:right; padding-top:30px; position:absolute; right:25px;}
+.res_ico{height:20px; line-height:20px; text-align:right;}
+.res_ico i{height: 15px;width: 30px; line-height:15px; padding:1px; margin-left:4px; text-align:center; font-family:"STHEITI"; font-size:12px; font-weight:bold; background-color:#FB4C2E; color:#ffffff; display:inline-block;}
+.jiantxt{ color:#FB4C2E; margin-left:2px; display:inline-block; height:15px; line-height:24px;}
+/*------------------resdetail---------------*/
+.imgbox{ width:100%; max-width:320px; height:180px; margin:0 auto; }
+.proname{ height:35px; line-height:35px; text-align:center; font-weight:bold; color:#343434; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin:0px 5px;}
+.pro_list{ margin:0 10px 10px;}
+.pro_list_tab li{ float:left;}
+.pro_list ul{background-color:#fff; height:60px; position:relative; overflow:hidden;}
+.pro_list ul:nth-child(2n){ background-color:#F7F7F7;}
+.more{ text-align:center; line-height:60px;}
+.more:after{ content:""; width: 8px; height: 15px; float:right; background:url(http://res.m.ctrip.com/html5/Content/images/ico_arrowright.png) 50% 50% no-repeat; background-size:8px 15px; position:relative; top:22px; right:20px;}
+.infobox{background-color: #fff;padding:10px; margin:10px;}
+.infobox p{ color:#666666;}
+.infobox li{ height:40px; line-height:40px; background-color:#F5F5F5; margin-bottom:10px; text-indent:10px; position:relative;}
+.infobox li:last-child{ margin-bottom:0;}
+.infobox li:after{ content:""; width: 8px; height: 15px; float:right; background:url(http://res.m.ctrip.com/html5/Content/images/ico_arrowright.png) 50% 50% no-repeat; background-size:8px 15px; position:relative; top:12px; right:10px;}
+.pro_select{ padding:20px 15px;}
+.pro_ticket{ width:58%; height:100%; line-height:1.5em; margin:0; overflow:hidden; display:table; vertical-align:middle;}
+.pro_ticketcont{ width:100%; height:100%;display:table-cell; vertical-align:middle; }
+.pro_ticket span{ vertical-align:middle; display:inline-block;}
+.pro_price{ width:25%;color: #ff7800; font-size:16px; text-align:right; position:absolute; right:10px; padding:10px 0;}
+.pro_price .res_ico i{background-color:#ff7800;}
+.pro_price .jiantxt{ color:#ff7800; font-size:13px; font-weight:bold;}
+.selectbg{ width: 20px; height: 20px; background:url(http://res.m.ctrip.com/html5/WebApp/images/icon_select.png) 50% 50% no-repeat;background-size:auto 20px; }
+.no{background-position:0px top;} .on{background-position:-24px top;}
+/*------------------bookInfo---------------*/
+.book_ticket{ width:52%; font-size:16px; font-weight:bold; line-height:20px; padding-left:20px;}
+.book_price{ position:absolute; right:15px;}
+.book_price strong{font-size: 20px;color: #ff7800; font-weight:600;}
+.infobox .txtbox:after{ background:none;}
+.room_num { display:inline-block; width:110px; height:29px; line-height:29px; padding-right:5px; border:1px solid #D3D3D3; color:#2390F4; font-weight: bold; text-align: center; position: absolute; float:right; right:10px; top:5px;}
+.room_num i { position:absolute; width:30px; height:29px; background:#BABABA; font-size:30px; font-weight:800; line-height:25px; color:#fff; cursor:pointer; padding-right:10px; }
+.room_num i:nth-of-type(1) { left:-1px; }
+.room_num i:nth-of-type(2) { right:-1px; }
+.room_num .num_invalid { background:#DADADA;}
+.infobox li span.date{position:absolute; right:30px; color:#2390F4; font-weight:bold;}
+.bookticket{ height:auto; position:relative; margin-bottom:10px;}
+.bookticket .res_ico{ text-align:left; line-height:30px;}
+.bookticket .res_ico i{ margin-left:0;}
+.price1{ position:absolute; right:0; top:0;}
+.price2{ position:absolute; right:0; top:25px;}
+ .probox{ background-color:#fff; margin:10px 0 20px 0; padding:10px;}
+ .probox .blueleft{ width:90px; top:-15px; left:-5px; margin-bottom:-10px;}
+/*------------------orderQuery---------------*/
+ .validate{ margin-bottom:-10px;}
+ .validate .ui-block-a{ width:60%;}.validate .ui-block-b{ width:27%; float:right;}
+ .validate .btn{width:108px; height:40px; border:none; background-color:#FF7800; color:#fff; font-weight:bold; font-size:16px; float:right;-webkit-appearance: none;border-radius:0px;}
+ .validate .btn.s{ background-color:#D7D7D7;} /*60秒后重发*/
+ .ui-btn-select{background-color:#0073c3;color: #FFFFFF;font-weight: bold; font-size:18px; width:100%; height:44px; line-height:44px; margin-top:10px; text-align:center; border:none;-webkit-appearance: none;border-radius:0px;}
+ .ui-btn-cancel{background-color:#31a9e9;color: #FFFFFF;font-weight: bold; font-size:18px; width:100%; height:44px; line-height:44px; margin-top:10px; text-align:center; border:none;-webkit-appearance: none;border-radius:0px;}
+ .bottxt{color:#424242; font-size:12px; margin-top:10px; text-align:center;}
+ /*------------------orderlist---------------*/
+ .orderlist{ background-color:#fff;}
+ .orderlist nav{margin:5px 0 -8px 0;}
+ .blueleft {border-top: 30px solid #31A9E9;border-right: 10px solid transparent;height: 0;width: 180px;color: #fff;position: relative;top:-5px;left:5px;display:inline-block;}
+ .blueleft p{ position: absolute; left:15px; height:28px; line-height:13px; bottom:-5px; }
+ .blueleft p.two{ font-size:12px; bottom:0px;}.blueleft p.middle{ font-size:13px; bottom:-5px;}
+ .yellowright {border-bottom: 30px solid #FFE100;border-left: 10px solid transparent;height: 0;width: 95px;line-height: 30px;color: #333333;position: relative;top:-5px;text-align: center;display:inline-block;}
+ .yellowright p{ font-size:13px; line-height:8px; text-align:right; padding:5px 8px 0 0;}
+ .ord_tab{border-bottom: 1px solid #E8EBEF;width: 100%; padding:15px 0; overflow: hidden;font-size:16px; position:relative;}
+ .ord_tab:active{ background-color:#f2f2f2;}
+ .ord_tab li{float: left;}
+ .ord_pro{ width:65%; text-indent:15px; line-height:20px;} 
+ .ord_prodiv{ white-space: nowrap;overflow: hidden;text-overflow: ellipsis; width:100%;}
+ .ord_pro p{ color:#A9A9A9; font-size:13px;}
+ .ord_num{ width:30%; text-align:right; position:absolute; top:22px; right:15px;}
+ .ord_price{ width:30%; text-align:right; position:absolute; top:25px; right:15px; color: #ff7800;}
+  /*------------------orderDetail---------------*/
+ .ord_state{ width:100%; padding:15px 0; background-color:#fff; overflow:hidden; position:relative;}
+ .ord_state li{ float:left;}
+ .ord_state .order{ width:80%;text-indent:20px; line-height:22px; font-size:16px;}.order p{ font-size:14px;}
+ .ord_state .state{ width:20%; text-align:right; position:absolute; top:22px; right:20px; font-size:18px; font-weight:bold; color:#2EB3F9;}
+ .person_info{ background-color:#fff; margin-top:15px; padding-bottom:6px;}
+ .person_info .blueleft{ width:90px;}
+ .person_info li{ text-indent:20px; line-height:35px;color:#999999;}
+ .person_info li span{margin-left:20px; color:#333333; }
+ .ordtxt{font-size:13px; text-align:center; color:#424242;}
+ /*------------------orderResult---------------*/
+ .orderstate{ padding:10px; text-align:center; font-size:20px; background-color:#fff; color: #8BBE52; height:85px;}
+ .orderstate strong{ padding:15px 0; text-align:left; padding-left:20px; display:inline-block;}
+ .download{ width:100%; height:70px;  margin-top:10px; background-color:#31A9E9; color:#fff; font-size:16px; position:relative;}
+ .download:after{content:""; width: 57px; height: 57px; float:left;background: #31A9E9 url(http://res.m.ctrip.com/html5/WebApp/images/ctrip.png) 50% 50% no-repeat; background-size: 57px 57px; position:relative; top:5px; left:5px;}
+ .download strong{ font-size:20px;position:absolute; left:80px; top:10px;}
+ .download p{ position:absolute; left:80px; top:40px;}
+ .orderfailed{padding:10px; text-align:center; font-size:20px; background-color:#fff; color: #D31D00; height:150px; position:relative;}
+ .orderfailed h1{ display:inline-block; width:40px; font-size:60px; position:absolute; left:45px;}
+ .orderfailed strong{ width:60%; position:absolute; right:40px; top:30px;}
+ .orderfailed .ui-grid-a{ margin-top:80px;}
+ .orderfailed .ui-block-a,.orderfailed .ui-block-b{ width:47%;}
+ .orderfailed .ui-block-b{ margin-left:6%;}
+ 
+
+.ctrip-confirm{ background:#0073c3;}
+
+/* ui-select default css */
+body select{ opacity:0; }
+.cui-form-select{ cursor:pointer;  color: #29A2F7;height:30px; line-height:30px; display:block; background-size:auto 30px; text-align:right; padding-right:40px;}
+.cui-select-float-box{  display:none; left:0px; top:0px; z-index:180;cursor:pointer;line-height:30px; text-align:center;}
+.cui-select-option{ height:50px; line-height:50px; background:#fff; width:100%; text-align:left; text-indent:10px; font-size:15px; font-weight:bold;-webkit-tap-highlight-color:#EBF4FA !important;}
+.cui-option-current{ background:#EBF4FA url("images/cityHover.png") no-repeat 98% center !important; background-size:22px 24px !important; }
+.cui-select-close{ height:100%; width:80px;  position:absolute; left:0px; top:0px; text-indent:-9999px; overflow:hidden;}
+.cui-select-close:after{ content:''; display:block;background:url(http://res.m.ctrip.com/html5/Content/images/ico_head.png) no-repeat left top; background-size:auto 22px; width:15px; height:22px; position:absolute; bottom:22px; left:10px; overflow:hidden; }
+.cui-select-head{ height:60px; width:100%; line-height:60px; background-color:#0073C3; position:relative; color:#fff; font-weight:bold; font-size:18px; z-index:999;}
+.cui-select-cont-box{ margin:10px;}
+
+/*** **/
+body .orderinvalid{ background:#ccc; }
+.ticketdetails{  background:#fff;}
+.emptyinfomation{ padding-top:30px; }
+
+/** 底部提交按键 **/
+.m-submit-box{ height:44px; }
+.m-submit{ right:0px; bottom:0px; height:44px; position:fixed; width:100%; background:#ff942b; font-size:16px; color:#fff; font-weight:bold;}
+.m-submit-fixed{ position:fixed; left:0px; bottom:0px; width:100%; height:44px; background:#ff942b; }
+.m-submit-fixed .m-submit{ width:30%; min-width:150px; float:right; position:absolute; background:#ff7e00;  }
+.m-submit-fixed .m-price{ height:100%; line-height:44px; font-size:1.2em; text-indent:10px; font-weight:bold; color:#333; }
+.m-submit-fixed .m-price span{ padding-left:5px; color:#fff; font: 600 1.43em/2 "Arial";}
+.m-submit-fixed .m-price span em{  }
