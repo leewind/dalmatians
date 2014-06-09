@@ -11,6 +11,7 @@ var ListView = _.inherit(Dalmatian.View, {
     $super(options);
   }
 });
+var listView = new ListView();
 
 var ListAdapter = _.inherit(Dalmatian.Adapter, {
   format: function() {
@@ -20,29 +21,26 @@ var ListAdapter = _.inherit(Dalmatian.Adapter, {
     var scope = this;
     if (this.datamodel && this.datamodel.feed) {
       _.each(this.datamodel.feed.entry, function(item) {
-        // console.log(item)
         scope.viewmodel.hotposts.push(item)
       });
     };
 
-    console.log(this.viewmodel)
-
     return this.viewmodel;
   }
 });
+var listAdapter = new ListAdapter();
 
 var ListController = _.inherit(Dalmatian.ViewController, {
   //设置默认信息
   initialize: function ($super, options) {
-    this.view = new ListView();
-    this.adapter = new ListAdapter();
+    this.view = listView;
+    this.adapter = listAdapter;
     this.container = '.hotlist';
 
     this.messagebox = new Dalmatian.MessageBox({
       center: messagecenter,
       namespace: 'cnblog-hotposts'
     });
-    this.viewstatus = 'init';
 
     messagecenter.register(this.messagebox);
 
@@ -50,21 +48,21 @@ var ListController = _.inherit(Dalmatian.ViewController, {
   },
 
   render: function () {
-    this.view.render(this.viewstatus, this.adapter.getViewModel());
+    var html = this.view.render(this.viewstatus, this.adapter.getViewModel());
     this.view.root.html(this.view.html);
   },
 
-  onViewAfterShow: function () {
+  onViewAfterShow: function() {
 
     var scope = this;
     $.ajax({
       type: 'get',
       url: 'http://dalcnblog.sinaapp.com/api/48HoursTopViewPosts/10',
-      success: function (data) {
+      success: function(data) {
         scope.adapter.datamodel = data;
         scope.adapter.notifyDataChanged();
       },
-      error: function (error) {
+      error: function(error) {
         console.error(error)
       }
     })
@@ -74,10 +72,7 @@ var ListController = _.inherit(Dalmatian.ViewController, {
     'click .hotlist li': 'readPost'
   },
 
-  readPost: function (event) {
-    console.log($(event.currentTarget).attr('data-id'));
-
-
+  readPost: function(event) {
     var postid = $(event.currentTarget).attr('data-id');
 
     // var scope = this;
@@ -97,12 +92,14 @@ var ListController = _.inherit(Dalmatian.ViewController, {
     //   })
     // };
 
-    var message = this.messagebox.create({ postid: postid });
+    var message = this.messagebox.create({postid: postid});
     this.messagebox.send('cnblog-hotposts', null, message);
   }
 });
 
-var controller = new ListController();
+var controller = new ListController({
+  viewstatus: 'init'
+});
 controller.show();
 
 
@@ -139,8 +136,6 @@ var ContentController = _.inherit(Dalmatian.ViewController, {
       namespace: 'cnblog-hotposts',
       onReceived: function(message) {
 
-        console.log(message)
-
         if (message && message.data && message.data.postid) {
           scope.readPost(message.data.postid);
         }
@@ -165,7 +160,6 @@ var ContentController = _.inherit(Dalmatian.ViewController, {
       $.ajax({
         url: 'http://dalcnblog.sinaapp.com/api/blog/'+postid,
         success: function(data) {
-          console.log(data);
           $('.content').html(data.string);
 
           scope.lock = false;
@@ -178,5 +172,7 @@ var ContentController = _.inherit(Dalmatian.ViewController, {
   }
 });
 
-var contenController = new ContentController();
+var contenController = new ContentController({
+  viewstatus: 'init'
+});
 contenController.show();

@@ -1,6 +1,8 @@
+"use strict";
+
 Dalmatian = Dalmatian || {};
 
-Dalmatian.Message = Message = _.inherit({
+var Message = Dalmatian.Message = _.inherit({
   initialize: function(options) {
     this.data = options.data;
     this.id = _.unique('message-');
@@ -16,7 +18,6 @@ Dalmatian.Message = Message = _.inherit({
 
 Dalmatian.MessageBox = _.inherit({
 
-  // @description
   initialize: function(options) {
     this.handleOptions(options);
   },

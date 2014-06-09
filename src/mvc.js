@@ -1,15 +1,14 @@
 "use strict";
 
-// @description 正式的声明Dalmatian框架的命名空间
+// 正式的声明Dalmatian框架的命名空间
 var Dalmatian = Dalmatian || {};
 
-// @description 定义默认的template方法来自于underscore
+// 定义默认的template方法来自于underscore
 Dalmatian.template = _.template;
 
 Dalmatian.View = _.inherit({
 
   /**
-   * [_initRoot description]
    * 私有方法，根据html生成的dom包装对象
    */
   _initRoot: function () {
@@ -18,7 +17,6 @@ Dalmatian.View = _.inherit({
   },
 
   /**
-   * [_initialize description]
    * 私有方法，设置默认属性
    */
   _initialize: function () {
@@ -30,14 +28,13 @@ Dalmatian.View = _.inherit({
   },
 
   /**
-   * [initialize description]
    * 构造函数入口，执行实例化时必定会执行initialize方法，
    * 所有初始化的动作，都需要在这里被执行
    * 有两个字段必须被定义，statusSet和templateSet，
    * 用户可以在构造函数执行时传入，也可以在复写initialize时定义
    * 这里的目标是用status做template的map，即status代表了template的映射关系
    *
-   * @param  {[object]} options [用户自定义传入的参数]
+   * @param  {object} options 用户自定义传入的参数
    */
   initialize: function (options) {
     this._initialize();
@@ -46,10 +43,9 @@ Dalmatian.View = _.inherit({
   },
 
   /**
-   * [handleOptions description]
    * 操作构造函数传入参数，将其绑定在实例对象上
    *
-   * @param  {[object]} options [用户自定义传入的参数]
+   * @param  {object} options 用户自定义传入的参数
    */
   handleOptions: function (options) {
     // 从形参中获取key和value绑定在this上
@@ -58,12 +54,11 @@ Dalmatian.View = _.inherit({
   },
 
   /**
-   * [render description]
    * 根据status的值找到具体的template，加载数据渲染具体的view
    *
-   * @param  {[enum]}     status    [View的状态参数]
-   * @param  {[object]}   data      [匹配View的数据格式的具体数据]
-   * @param  {Function}   callback  [执行完成之后的回调]
+   * @param  {enum}       status    View的状态参数
+   * @param  {object}     data      匹配View的数据格式的具体数据
+   * @param  {function}   callback  执行完成之后的回调
    */
   render: function (status, data, callback) {
 
@@ -80,20 +75,19 @@ Dalmatian.View = _.inherit({
 
       this.currentStatus = status;
 
-      _.callmethod(callback, this);
+      _.execute(callback, this);
 
       return this.html;
     }
   },
 
   /**
-   * [update description]
    * 根据view的status变化判断是不是需要重新render，
    * 如果不需要重新render，调用完成之后回调onUpdate方法，
    * onUpdate需要被定义在回调过程中可以使用，用来作为对DOM操作的补充
    *
-   * @param  {[enum]} status [view的状态值]
-   * @param  {[type]} data   [viewmodel的数据]
+   * @param  {enum]}  status view的状态值
+   * @param  {object} data   viewmodel的数据
    */
   update: function (status, data) {
 
@@ -104,14 +98,13 @@ Dalmatian.View = _.inherit({
     // onUpdate是可复写和自定义的部分，当数据发生变化但是状态没有发生变化时，
     // 页面仅仅变化的可以是局部显示，可以通过获取this.html进行修改，
     // 可以使render的操作也可以使对dom的操作
-    _.callmethod(this.onUpdate, this, data);
+    _.execute(this.onUpdate, this, data);
   }
 });
 
 Dalmatian.Adapter = _.inherit({
 
   /**
-   * [_initialize description]
    * 私有方法，设置默认属性
    */
   _initialize: function () {
@@ -120,10 +113,9 @@ Dalmatian.Adapter = _.inherit({
   },
 
   /**
-   * [initialize description]
    * 构造函数入口
    *
-   * @param  {[object]} options [用户自定义传入的参数]
+   * @param  {object} options 用户自定义传入的参数
    */
   initialize: function (options) {
     this._initialize();
@@ -131,10 +123,9 @@ Dalmatian.Adapter = _.inherit({
   },
 
   /**
-   * [handleOptions description]
    * 操作构造函数传入参数，将其绑定在实例对象上
    *
-   * @param  {[object]} options [用户自定义传入的参数]
+   * @param  {object} options 用户自定义传入的参数
    */
   handleOptions: function (options) {
 
@@ -143,13 +134,12 @@ Dalmatian.Adapter = _.inherit({
   },
 
   /**
-   * [format description]
    * 需要被重写，format方法承载两个作用
    * 1. 将datamodel格式化到viewmodel，格式化的规则由用户自定义
    * 2. 对datamodel和viewmodel赋值
    *
-   * @param  {[object]} data [需要格式化的数据]
-   * @return {[object]}      [viewmodel]
+   * @param  {object} data 需要格式化的数据
+   * @return {object}      viewmodel
    */
   format: function (data) {
     this.datamodel = this.viewmodel = data;
@@ -157,20 +147,18 @@ Dalmatian.Adapter = _.inherit({
   },
 
   /**
-   * [getViewModel description]
    * 调用format方法，格式化datamodel到viewmodel
    *
-   * @return {[object]} [viewmodel]
+   * @return {object} viewmodel
    */
   getViewModel: function () {
     return this.format(this.datamodel);
   },
 
   /**
-   * [registerObserver description]
    * 向观察者队列中添加新的观察者
    *
-   * @param  {[ViewController]} viewcontroller [新的观察者]
+   * @param  {ViewController} viewcontroller 新的观察者
    */
   registerObserver: function (viewcontroller) {
     // 检查队列中如果没有重复的viewcontroller，从队列尾部推入
@@ -181,10 +169,9 @@ Dalmatian.Adapter = _.inherit({
   },
 
   /**
-   * [unregisterObserver description]
    * 从观察者队列中剔除特定的观察者
    *
-   * @param  {[ViewController]} viewcontroller [特定的需要剔除的观察者]
+   * @param  {ViewController} viewcontroller 特定的需要剔除的观察者
    */
   unregisterObserver: function (viewcontroller) {
     // 从observers的队列中剔除viewcontroller
@@ -194,17 +181,16 @@ Dalmatian.Adapter = _.inherit({
   },
 
   /**
-   * [notifyDataChanged description]
    * 通知观察者队列中所有观察者，数据发生变化，调用观察者update接口
    *
-   * @return {[type]} [description]
+   * @return {type} description
    */
   notifyDataChanged: function () {
     // 通知所有注册的观察者被观察者的数据发生变化
     var data = this.getViewModel();
     _.each(this.observers, function (viewcontroller) {
       if (_.isObject(viewcontroller))
-        _.callmethod(viewcontroller.update, viewcontroller, [data]);
+        _.execute(viewcontroller.update, viewcontroller, [data]);
     });
   }
 });
@@ -212,7 +198,6 @@ Dalmatian.Adapter = _.inherit({
 Dalmatian.ViewController = _.inherit({
 
   /**
-   * [_initialize description]
    * 私有方法，创建不可重复的controllerid
    */
   _initialize: function () {
@@ -220,7 +205,6 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
-   * [_handleAdapter description]
    * 处理dataAdpter中的datamodel，为其注入view的默认容器数据
    */
   _handleAdapter: function () {
@@ -230,10 +214,9 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
-   * [_verify description]
    * 验证用户是不是提供了必要的参数
    *
-   * @param  {[object]} options [用户自定义传入的参数]
+   * @param  {object} options 用户自定义传入的参数
    */
   _verify: function (options) {
 
@@ -246,10 +229,7 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
-   * [_create description]
    * 私有方法，创建根元素的dom结构
-   *
-   * @return {[type]} [description]
    */
   _create: function () {
     this.render();
@@ -261,7 +241,13 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
-   * [_show description]
+   * 私有方法，调用update方法执行页面刷新，update方法可以被复写做dom操作
+   */
+  _recreate: function () {
+    this.update();
+  },
+
+  /**
    * 私有方法，将dom黏贴到document上去，并且设置页面为显示
    */
   _show: function () {
@@ -271,10 +257,32 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
-   * [handleOptions description]
+   * 私有方法，将dom隐藏，并且将所有的绑定在dom上的事件冻结
+   */
+  _hide: function () {
+    this.forze();
+    this.$el.hide();
+  },
+
+  /**
+   * 私有方法，冻结dom的所有元素上的所有事件
+   */
+  _forze: function () {
+    this.unBindEvents();
+  },
+
+  /**
+   * 私有方法，先冻结dom之后移除dom
+   */
+  _destory: function () {
+    this.unBindEvents();
+    this.$el.empty();
+  },
+
+  /**
    * 操作构造函数传入参数，将其绑定在实例对象上
    *
-   * @param  {[object]} options [用户自定义传入的参数]
+   * @param  {object} options 用户自定义传入的参数
    */
   handleOptions: function (options) {
     if (options) {
@@ -287,7 +295,6 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
-   * [initialize description]
    * 初始化ViewController，建立controllerid，设置adapter作为controller的被观察者
    * 传入的一些参数：
    * 1. container 用户设置的容器选择器或者dom结构，可选
@@ -296,7 +303,7 @@ Dalmatian.ViewController = _.inherit({
    * 4. viewstatus 初始化view的状态值定义，必须
    * controller创建$el元素
    *
-   * @param  {[object]} options [用户自定义传入的参数]
+   * @param  {object} options 用户自定义传入的参数
    */
   initialize: function (options) {
     this._initialize();
@@ -306,7 +313,6 @@ Dalmatian.ViewController = _.inherit({
   },
 
   /**
-   * [render description]
    * 可以被复写，调用view的render方法去渲染具体的view
    */
   render: function () {
@@ -322,63 +328,81 @@ Dalmatian.ViewController = _.inherit({
   //   this.viewstatus = status;
   // },
 
-  // @description 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话，直接调用render方法重绘
-  // @notation 这个方法需要重构
+  /**
+   * 当数据发生变化时调用onViewUpdate，如果onViewUpdate方法不存在的话
+   * 直接调用render方法重绘
+   * 这个方法可以被复写，开发者可以用update接口来操作具体dom
+   *
+   * @param  {object} data adapter中的viewmodel
+   * @return {boolean}     回调结束标识符
+   */
   update: function (data) {
 
-    //    _.callmethod(this.hide, this);
-
     if (this.onViewUpdate) {
-      _.callmethod(this.onViewUpdate, this, [data]);
-      return;
+      return _.execute(this.onViewUpdate, this, [data]);
     }
 
     this.render();
-
-    //    _.callmethod(this.show, this);
   },
 
   /**
-   * [create description]
    * 生命周期create，提供了两个回调onViewBeforeCreate和onViewAfterCreate，
    * 分别在create之前和之后执行
    */
   create: function () {
     // 在create方法调用前后设置onViewBeforeCreate和onViewAfterCreate两个回调
-    _.wrapmethod(this._create, 'onViewBeforeCreate', 'onViewAfterCreate', this);
+    _.pack(this._create, 'onViewBeforeCreate', 'onViewAfterCreate', this);
   },
 
   /**
-   * [show description]
    * 生命周期show，提供了两个回调onViewBeforeShow和onViewAfterShow，
    */
   show: function () {
-    _.wrapmethod(this._show, 'onViewBeforeShow', 'onViewAfterShow', this);
+    _.pack(this._show, 'onViewBeforeShow', 'onViewAfterShow', this);
   },
 
   /**
-  * @description 如果进入create判断是否需要update一下页面，sync view和viewcontroller的数据
-  */
-  _recreate: function () {
-    this.update();
-  },
-
+   * 生命周期recreate,提供了两个回调onViewBeforeRecreate和onViewAfterRecreate
+   */
   recreate: function () {
-    _.wrapmethod(this._recreate, 'onViewBeforeRecreate', 'onViewAfterRecreate', this);
+    _.pack(this._recreate, 'onViewBeforeRecreate', 'onViewAfterRecreate', this);
   },
 
-  //事件注册点
+  /**
+   * 生命周期recreate,提供了两个回调onViewBeforeHide和onViewAfterHide
+   */
+  hide: function () {
+    _.pack(this._hide, 'onViewBeforeHide', 'onViewAfterHide', this);
+  },
+
+  /**
+   * 生命周期forze,提供了两个回调onViewBeforeForzen和onViewAfterForzen
+   */
+  forze: function () {
+    _.pack(this._forze, 'onViewBeforeForzen', 'onViewAfterForzen', this);
+  },
+
+  /**
+   * 生命周期destory，提供了两个回调onViewBeforeDestory和onViewAfterDestory
+   */
+  destory: function () {
+    _.pack(this._destory, 'onViewBeforeDestory', 'onViewAfterDestory', this);
+  },
+
+  /**
+   * 解析events，根据events的设置在dom上设置事件
+   */
   bindEvents: function () {
     var events = this.events;
 
     if (!(events || (events = _.result(this, 'events')))) return this;
     this.unBindEvents();
 
-    // @description 解析event参数的正则
+    // 解析event参数的正则
     var delegateEventSplitter = /^(\S+)\s*(.*)$/;
     var key, method, match, eventName, selector;
 
-    //注意，此处做简单的字符串数据解析即可，不做实际业务
+    // 做简单的字符串数据解析
     for (key in events) {
       method = events[key];
       if (!_.isFunction(method)) method = this[events[key]];
@@ -399,36 +423,14 @@ Dalmatian.ViewController = _.inherit({
     return this;
   },
 
-  //取消所有事件
+  /**
+   * 冻结dom上所有元素的所有事件
+   *
+   * @return {object} 执行作用域
+   */
   unBindEvents: function () {
     this.$el.off('.delegateEvents' + this.view.viewid);
     return this;
   },
 
-  _hide: function () {
-    this.forze();
-    this.$el.hide();
-  },
-
-  hide: function () {
-    _.wrapmethod(this._hide, 'onViewBeforeHide', 'onViewAfterHide', this);
-  },
-
-  _forze: function () {
-    this.unBindEvents();
-  },
-
-  forze: function () {
-    _.wrapmethod(this._forze, 'onViewBeforeForzen', 'onViewAfterForzen', this);
-  },
-
-  _destory: function () {
-    this.unBindEvents();
-    this.$el.remove();
-    //    delete this;
-  },
-
-  destory: function () {
-    _.wrapmethod(this._destory, 'onViewBeforeDestory', 'onViewAfterDestory', this);
-  }
 });

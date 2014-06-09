@@ -1,12 +1,8 @@
-if (typeof require === 'function') {
-  var assert = require("assert");
-  var _ = require("../src/underscore-extend");
-};
+suite('Underscore.extend', function() {
 
-describe("underscore.extend", function() {
-  describe("inherit", function() {
-    it('should inherit object function', function() {
+  suite('#inherit(origin, methods)', function() {
 
+    test('should inherit object function', function() {
       var origin = _.inherit({
         name: 'origin',
         tag: 'origin',
@@ -42,16 +38,16 @@ describe("underscore.extend", function() {
       assert(expectInstance.name === realInstance.name, 'name value should be inherited');
       assert(expectInstance.show() === realInstance.show());
       assert(expectInstance.spec() === realInstance.spec());
-    });
+    })
   });
 
-  describe("getNeedFn", function() {
-    it('should return function by key value', function() {
+  suite("#realize(key, scope)", function() {
+    test('should return function by key value', function() {
       var action = function() {
         return 'keyFn'
       }
 
-      var requireFn = _.getNeedFn(action, this);
+      var requireFn = _.realize(action, this);
       assert(typeof requireFn === 'function');
       assert(requireFn() === 'keyFn');
 
@@ -60,12 +56,53 @@ describe("underscore.extend", function() {
           return 'keyFn'
         }
       };
-      var requireFn = _.getNeedFn('keyFn', action);
+      var requireFn = _.realize('keyFn', action);
       assert(typeof requireFn === 'function');
       assert(requireFn() === 'keyFn');
 
-      var requireFn = _.getNeedFn();
+      var requireFn = _.realize();
       assert(typeof requireFn === 'function');
     });
+  });
+
+  suite('execute(method, scope, params)', function() {
+
+    test('shoudl call method by using passing scope', function() {
+      var Origin = function() {
+        this.name = 'this is origin method'
+      };
+      Origin.prototype.get = function() {
+        return this.name;
+      };
+      var origin = new Origin();
+
+      var Caller = function() {
+        this.name = 'this is caller method';
+      }
+      var caller = new Caller();
+
+      var str = _.execute(origin.get, caller, []);
+      assert(str === 'this is caller method');
+    });
+  });
+
+  suite('pack(fn, beforeFnKey, afterFnKey, context)', function() {
+
+    test('methods should be executed one by one', function() {
+      var value = 0;
+      var beforeFnKey = function() {
+        assert(value === 0);
+        value = 1;
+      }
+      var afterFnKey = function() {
+        assert(value === 2);
+      }
+
+      _.pack(function() {
+        assert(value === 1);
+        value = 2;
+      }, beforeFnKey, afterFnKey, this);
+    });
+
   });
 });
