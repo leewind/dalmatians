@@ -5,7 +5,7 @@ var Application = _.inherit({
   defaultPropery: function () {
 
     //存储view队列的hash对象，这里会新建一个hash数据结构，暂时不予理睬
-    this.views = new _.Hash();
+    this.views = {};
 
     //默认索引view
     this.indexView = 'index';
@@ -156,7 +156,7 @@ var Application = _.inherit({
 
   //根据viewId判断当前view是否实例化
   viewExist: function (viewId) {
-    return this.views.exist(viewId);
+    return typeof this.views[viewId] !== 'undefined';
   },
 
   //根据viewid，加载view的类，并会实例化
@@ -165,14 +165,14 @@ var Application = _.inherit({
 
     //每个键值还是在全局views保留一个存根，若是已经加载过便不予理睬
     if (this.viewExist(viewId)) {
-      _.execute(callback, this, this.views.getItem(viewId));
+      _.execute(callback, this, this.views[viewId]);
       return;
     }
 
     requirejs([this._buildPath(viewId)], $.proxy(function (View) {
       var view = new View();
 
-      this.views.push(viewId, view);
+      this.views[viewId] = view;
 
       //将当前view实例传入，执行回调
       _.execute(callback, this, view);
@@ -187,6 +187,11 @@ var Application = _.inherit({
 
   //注意，此处的url可能是id，也可能是其它莫名其妙的，这里需要进行解析
   forward: function (viewId) {
+
+    //每个键值还是在全局views保留一个存根，若是已经加载过便不予理睬
+    if (this.viewExist(viewId) && viewId == this.curView.viewId) {
+      return;
+    }
 
     //用户行为导致view切换，暂时关闭url监控
     this.stopListeningRoute();
