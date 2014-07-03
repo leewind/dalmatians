@@ -18,7 +18,7 @@
     },
 
     format: function (datamodel) {
-      return datamodel && datamodel.value;
+      return datamodel;
     },
 
     setData: function (data) {
@@ -60,8 +60,19 @@
 
     },
 
+    onViewBeforeCreate: function () {
+      if (!app.message) {
+        console.log('参数错误');
+        app.back();
+        return;
+      }
+    },
+
     //显示后Ajax请求数据
     onViewAfterShow: function () {
+      this.adapter.datamodel = app.message;
+      this.update();
+
       var id = _.getUrlParam().id;
       var scope = this;
       if (id) {

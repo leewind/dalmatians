@@ -1,0 +1,99 @@
+<!doctype html>
+<!--[if (gte IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!-->
+<html class="ie">
+<!--<![endif]-->
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>hello world</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta content="telephone=no" name="format-detection" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link href="res/style/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body onselectstart="return false">
+  <script src="../../vendor/require.js" type="text/javascript"></script>
+  <script src="../../vendor/zepto.min.js" type="text/javascript"></script>
+  <script src="../../vendor/underscore-min.js" type="text/javascript"></script>
+  <script src="../../src/underscore-extend.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+
+    /*
+    require.config({
+    baseUrl: '',
+    paths: {
+    'text': '../../vendor/require.text'
+    }
+    });
+    */
+
+
+    (function () {
+
+      var app = '../../';
+
+      window.getAppUITemplatePath = function (path) {
+        return 'text!../../ui/' + path + '.html';
+      }
+
+      require.config({
+        shim: {
+          _: {
+            exports: '_'
+          }
+        },
+        paths: {
+          'text': app + 'vendor/require.text',
+          //UI×é¼þ
+          'UIView': app + 'ui/ui.abstract.view',
+          'UILayer': app + 'ui/ui.layer',
+          'UIAlert': app + 'ui/ui.alert',
+          'UIMask': app + 'ui/ui.mask',
+          'UILoading': app + 'ui/ui.loading',
+          'UIReLoading': app + 'ui/ui.reloading',
+          'UIToast': app + 'ui/ui.toast',
+          'UIInlineView': app + 'ui/ui.inline.view',
+          'UINum': app + 'ui/ui.num',
+          'UISwitch': app + 'ui/ui.switch',
+          'UIBubbleLayer': app + 'ui/ui.bubble.layer',
+          'UITab': app + 'ui/ui.tab',
+          'UITabs': app + 'ui/ui.tabs',
+          'UIScroll': app + 'ui/ui.scroll',
+          'UIScrollLayer': app + 'ui/ui.scroll.layer',
+          'UIRadioList': app + 'ui/ui.radio.list',
+          'UISelect': app + 'ui/ui.select',
+          'UIGroupSelect': app + 'ui/ui.group.select'
+        }
+
+      });
+
+    })();
+
+
+
+    require(['UIAlert', 'UIMask', 'UILoading', 'UIReLoading', 'UIToast', 'UINum', 'UISwitch', 'UIBubbleLayer', 'UITab', 'UIRadioList', 'UIScrollLayer', 'UISelect', 'UIGroupSelect'], function (UIAlert, UIMask, UILoading, UIReLoading, UIToast, UINum, UISwitch, UIBubbleLayer, UITab, UIRadioList, UIScrollLayer, UISelect, UIGroupSelect) {
+
+      window.UIAlert = UIAlert;
+      window.UIMask = UIMask;
+      window.UILoading = UILoading;
+      window.UIReLoading = UIReLoading;
+      window.UIToast = UIToast;
+      window.UINum = UINum;
+      window.UIBubbleLayer = UIBubbleLayer;
+      window.UITab = UITab;
+      window.UIRadioList = UIRadioList;
+
+      var u = new UISelect();
+      u.show();
+
+
+      var u = new UIGroupSelect();
+      u.show();
+      window.u = u;
+
+    });
+    
+  </script>
+</body>
+</html>

@@ -39,6 +39,9 @@ var Application = _.inherit({
 
     this.wrapper = $('body');
 
+    //每次view切换时候可能传递的数据
+    this.message = null;
+
     //pushState的支持能力
     this.hasPushState = !!(this.history && this.history.pushState);
 
@@ -48,10 +51,19 @@ var Application = _.inherit({
     };
 
     //用户定义根据viewId设置url的规则
-    this.setUrlRule = function (viewId, hasPushState) {
-      var loc = window.location.href;
-      var url = loc.indexOf('?') ? (loc.substr(0, loc.indexOf('?')) + '?viewId=' + viewId) : (loc + '?viewId=' + viewId);
-      history.pushState('', {}, url);
+    this.setUrlRule = function (viewId, param, hasPushState) {
+      if (!viewId) return;
+
+      var k, loc = window.location.href, str = '', url = '';
+      if (param) {
+        for (k in param) {
+          str += '&' + k + '=' + param[k];
+        }
+      }
+
+      url = loc.indexOf('?') ? (loc.substr(0, loc.indexOf('?')) + '?viewId=' + viewId) : (loc + '?viewId=' + viewId);
+      history.pushState('', {}, url + str);
+
     };
 
   },
@@ -100,6 +112,7 @@ var Application = _.inherit({
   //当URL变化时
   onURLChange: function (e) {
     if (!this.isListeningRoute) return;
+    this.message = null;
 
     //点击浏览器后退，会触发后退
     this.switchView();
@@ -171,7 +184,7 @@ var Application = _.inherit({
 
     requirejs([this._buildPath(viewId)], $.proxy(function (View) {
       var view = new View();
-
+      view.viewId = viewId;
       this.views[viewId] = view;
 
       //将当前view实例传入，执行回调
@@ -186,17 +199,23 @@ var Application = _.inherit({
   },
 
   //注意，此处的url可能是id，也可能是其它莫名其妙的，这里需要进行解析
-  forward: function (viewId) {
+  forward: function (viewId, data) {
+    this.message = null;
 
     //每个键值还是在全局views保留一个存根，若是已经加载过便不予理睬
-    if (this.viewExist(viewId) && viewId == this.curView.viewId) {
+    if (this.curView && viewId == this.curView.viewId) {
+      this.curView.update();
       return;
     }
 
     //用户行为导致view切换，暂时关闭url监控
     this.stopListeningRoute();
 
-    this.setUrlRule(viewId);
+    this.setUrlRule(viewId, (data && data.param) || {});
+
+    if (data && data.message) {
+      this.message = data.message;
+    }
 
     //解析viewId逻辑暂时省略
     //......
@@ -209,7 +228,7 @@ var Application = _.inherit({
   },
 
   //后退操作
-  back: function (viewId) {
+  back: function (viewId, data) {
 
     if (history.length == 1 && !viewId) {
       viewId = this.indexViewId;
@@ -218,7 +237,7 @@ var Application = _.inherit({
     if (viewId) {
       //这里需要记录
       //this.forwardType = 'back'
-      this.forward(this.indexView);
+      this.forward(this.indexView, data);
     } else {
       history.back();
     }

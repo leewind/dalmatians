@@ -82,15 +82,29 @@
 
     },
 
-
-
     events: {
       'click .orderItem': function (e) {
         var el = $(e.currentTarget);
         var id = el.attr('data-id');
-        app.forward('detail&id=' + id);
+
+        var even = _.find([1, 2, 3, 4, 5, 6], function (num) { return num % 2 == 0; });
+
+        var data = _.find(this.adapter.getViewModel(), function (obj) {
+          return obj.id = id;
+        });
+
+        app.forward('detail', {
+          param: {
+            id: id
+          },
+          message: data
+        });
 
         var s = '';
+      },
+      'click .tabcrt': function () {
+        app.forward('index');
+
       }
     }
   });
