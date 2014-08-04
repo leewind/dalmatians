@@ -1,9 +1,9 @@
 'use strict';
 
 (function () {
-  this.Dalmatian = this.Dalmatian || {};
+  var Dalmatian = this.Dalmatian = this.Dalmatian || {};
 
-  var AbstractCommunicator = this.Dalmatian.AbstractCommunicator = _.inherit({
+  var AbstractCommunicator = Dalmatian.AbstractCommunicator = _.inherit({
     initialize: function($super, options) {
       $super(options);
     },
@@ -25,7 +25,7 @@
   var DEFAULT_CONTENT_TYPE = 'application/json';
   var DEFAULT_DATA_TYPE = 'json';
 
-  this.Dalmatian.AjaxCommunicator = _.inherit(AbstractCommunicator, {
+  Dalmatian.AjaxCommunicator = _.inherit(AbstractCommunicator, {
 
     initialize: function(options) {
       this.url = options.url;
@@ -85,7 +85,7 @@
     }
   });
 
-  this.Dalmatian.LocalStorageCommunicator = _.inherit(AbstractCommunicator, {
+  Dalmatian.LocalStorageCommunicator = _.inherit(AbstractCommunicator, {
 
     initialize: function() {
       if (!window.localStorage) {
