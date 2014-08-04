@@ -110,19 +110,10 @@ var dateUtil = {
     //自动减一以便操作
     month--;
     if ((typeof year == 'object') && (year instanceof Date)) {
-      month = year.getMonth(); 
+      month = year.getMonth();
       year = year.getFullYear();
     }
     var d = new Date(year, month, 1);
     return d.getDay();
   }
 };
-
-
-
-
-
-
-
-
-
