@@ -1,4 +1,6 @@
-﻿(function () {
+﻿'use strict';
+
+(function () {
 
   var window = this;
   var _ = window._;
@@ -19,7 +21,9 @@
   method.inherit = function (origin, methods) {
 
     // 参数检测，该继承方法，只支持一个参数创建类，或者两个参数继承类
-    if (arguments.length === 0 || arguments.length > 2) throw '参数错误';
+    if (arguments.length === 0 || arguments.length > 2) {
+      throw new Error('参数错误');
+    }
 
     var parent = null;
 
@@ -27,14 +31,18 @@
     var properties = slice.call(arguments);
 
     // 如果第一个参数为类（function），那么就将之取出
-    if (typeof properties[0] === 'function')
+    if (typeof properties[0] === 'function'){
       parent = properties.shift();
+    }
+
     properties = properties[0];
 
     // 创建新类用于返回
     function klass() {
-      if (_.isFunction(this.initialize))
+      /*jshint validthis:true */
+      if (_.isFunction(this.initialize)){
         this.initialize.apply(this, arguments);
+      }
     }
 
     klass.superclass = parent;
@@ -44,39 +52,42 @@
 
     if (parent) {
       // 中间过渡类，防止parent的构造函数被执行
-      var subclass = function () { };
-      subclass.prototype = parent.prototype;
-      klass.prototype = new subclass();
+      var Subclass = function () { };
+      Subclass.prototype = parent.prototype;
+      klass.prototype = new Subclass();
 
       // 父类的方法不做保留，直接赋给子类
       // parent.subclasses.push(klass);
     }
 
     var ancestor = klass.superclass && klass.superclass.prototype;
+
+    var handler = function (methodName, fn) {
+      return function () {
+        var scope = this;
+        var args = [
+          function () {
+            return ancestor[methodName].apply(scope, arguments);
+          }
+        ];
+        return fn.apply(this, args.concat(slice.call(arguments)));
+      };
+    };
+
     for (var k in properties) {
       var value = properties[k];
 
       //满足条件就重写
-      if (ancestor && typeof value == 'function') {
+      if (ancestor && typeof value === 'function') {
         var argslist = /^\s*function\s*\(([^\(\)]*?)\)\s*?\{/i.exec(value.toString())[1].replace(/\s/i, '').split(',');
         //只有在第一个参数为$super情况下才需要处理（是否具有重复方法需要用户自己决定）
         if (argslist[0] === '$super' && ancestor[k]) {
-          value = (function (methodName, fn) {
-            return function () {
-              var scope = this;
-              var args = [
-                function () {
-                  return ancestor[methodName].apply(scope, arguments);
-                }
-              ];
-              return fn.apply(this, args.concat(slice.call(arguments)));
-            };
-          })(k, value);
+          value = handler(k, value);
         }
       }
 
       //此处对对象进行扩展，当前原型链已经存在该对象，便进行扩展
-      if (_.isObject(klass.prototype[k]) && _.isObject(value) && (typeof klass.prototype[k] != 'function' && typeof value != 'fuction')) {
+      if (_.isObject(klass.prototype[k]) && _.isObject(value) && (typeof klass.prototype[k] !== 'function' && typeof value !== 'function')) {
         //原型链是共享的，这里不好办
         var temp = {};
         _.extend(temp, klass.prototype[k]);
@@ -88,8 +99,9 @@
 
     }
 
-    if (!klass.prototype.initialize)
+    if (!klass.prototype.initialize){
       klass.prototype.initialize = function () { };
+    }
 
     klass.prototype.constructor = klass;
 
@@ -105,8 +117,15 @@
    */
   method.realize = function(key, scope) {
     scope = scope || window;
-    if (_.isFunction(key)) return key;
-    if (_.isFunction(scope[key])) return scope[key];
+
+    if (_.isFunction(key)) {
+      return key;
+    }
+
+    if (_.isFunction(scope[key])) {
+      return scope[key];
+    }
+
     return function () { };
   };
 
@@ -152,45 +171,46 @@
     return _.execute(action, scope);
   };
 
-  // //获取url参数
-  // //这个方法还是有问题
-   method.getUrlParam = function (url, key) {
-     if (!url) url = window.location.href;
+  //获取url参数
+  //这个方法还是有问题
+   // method.getUrlParam = function (url, key) {
+   //   if (!url) url = window.location.href;
 
-     var searchReg = /([^&=?]+)=([^&]+)/g;
-     var urlReg = /\/+.*\?/;
-     var arrayReg = /(.+)\[\]$/;
-     var urlParams = {};
-     var match, name, value, isArray;
+   //   var searchReg = /([^&=?]+)=([^&]+)/g;
+   //   var urlReg = /\/+.*\?/;
+   //   var arrayReg = /(.+)\[\]$/;
+   //   var urlParams = {};
+   //   var match, name, value, isArray;
 
-     url = decodeURIComponent(url);
-     while (match = searchReg.exec(url)) {
-       name = match[1];
-       value = match[2];
-       isArray = name.match(arrayReg);
-       //处理参数为url这种情况
-       if (urlReg.test(value)) {
-         urlParams[name] = url.substr(url.indexOf(value));
-         break;
-       } else {
-         if (isArray) {
-           name = isArray[1];
-           urlParams[name] = urlParams[name] || [];
-           urlParams[name].push(value);
-         } else {
-           urlParams[name] = value;
-         }
-       }
-     }
+   //   url = decodeURIComponent(url);
+   //   while (match = searchReg.exec(url)) {
+   //     name = match[1];
+   //     value = match[2];
+   //     isArray = name.match(arrayReg);
+   //     //处理参数为url这种情况
+   //     if (urlReg.test(value)) {
+   //       urlParams[name] = url.substr(url.indexOf(value));
+   //       break;
+   //     } else {
+   //       if (isArray) {
+   //         name = isArray[1];
+   //         urlParams[name] = urlParams[name] || [];
+   //         urlParams[name].push(value);
+   //       } else {
+   //         urlParams[name] = value;
+   //       }
+   //     }
+   //   }
 
-     return key ? urlParams[key] : urlParams;
-   };
+   //   return key ? urlParams[key] : urlParams;
+   // };
   // ------------------------------------
 
   _.extend(_, method);
 
 
-  if (typeof module === 'object')
+  if (typeof module === 'object'){
     module.exports = _;
+  }
 
-}).call(this);
+}).call(window);
