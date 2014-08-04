@@ -1,0 +1,12 @@
+{
+  "name": "dalmatians",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "~3.0.3",
+    "jquery": "~1.11.0"
+  },
+  "devDependencies": {
+    "underscore": "~1.6.0",
+    "zepto": "~1.1.4"
+  }
+}

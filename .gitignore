@@ -1,6 +1,8 @@
-**/node_modules/
-**/.idea
-**/*.lock
-**/*.bak
+node_modules
+dist
+.tmp
+.sass-cache
+bower_components
+test/bower_components
 *.sublime-project
 *.sublime-workspace
